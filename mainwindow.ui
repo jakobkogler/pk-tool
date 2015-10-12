@@ -25,7 +25,11 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="files_combobox"/>
+       <widget class="QComboBox" name="files_combobox">
+        <property name="focusPolicy">
+         <enum>Qt::WheelFocus</enum>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
@@ -44,10 +48,23 @@
     </item>
     <item>
      <widget class="QTableWidget" name="table_widget">
+      <property name="focusPolicy">
+       <enum>Qt::WheelFocus</enum>
+      </property>
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
       </attribute>
      </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="console_output">
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="console"/>
     </item>
    </layout>
   </widget>

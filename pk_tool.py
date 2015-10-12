@@ -21,12 +21,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.find_files()
         self.current_group_idx = 0
+        self.write_lock = False
         self.checked_list = []
         self.open_file(0)
 
         self.files_combobox.currentIndexChanged.connect(self.open_file)
         self.action_export.triggered.connect(lambda: self.write_file(savefile=False))
         self.table_widget.cellChanged.connect(lambda: self.write_file(savefile=True))
+        self.console.returnPressed.connect(self.execute_console)
 
     def find_files(self):
         r = re.compile('185\.A79 Programmkonstruktion \(VU 6,0\) 2015W_Übungsanmeldung \(.* Gruppen\)_(.*?)_Überblick.txt')
@@ -54,6 +56,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 if m:
                     students.append(Student(*(m.group(i) for i in range(1, 4))))
 
+        self.write_lock = True
         self.table_widget.clear()
         labels = 'Name Matrikelnr. Anwesend Adhoc Kommentar'.split()
         self.table_widget.setRowCount(len(students))
@@ -90,7 +93,11 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.table_widget.resizeColumnsToContents()
 
+        self.write_lock = False
+
     def write_file(self, savefile=True):
+        if self.write_lock:
+            return
         if savefile:
             now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
             file_name = 'Saves/{}_{}.csv'.format(self.files_combobox.currentText(), now)
@@ -108,6 +115,38 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     self.table_widget.item(idx, 4).text()
                 ))
 
+    def find_index(self, name):
+        indices = [i for i in range(self.table_widget.rowCount())
+                   if name.lower() in self.table_widget.item(i, 0).text().lower()]
+        return indices[0] if len(indices) == 1 else None
+
+    def execute_console(self):
+        try:
+            commands = self.console.text().split(' ')
+            name, command = commands[0], ' '.join(commands[1:])
+            index = self.find_index(name)
+            if index is not None:
+                full_name = self.table_widget.item(index, 0).text()
+                if command == 'a':
+                    self.checked_list[index].setCheckState(QtCore.Qt.Checked)
+                    template = '{} ist anwesend'
+                elif command == 'b':
+                    self.checked_list[index].setCheckState(QtCore.Qt.Unchecked)
+                    template = '{} ist nicht anwesend'
+                elif command.isdigit():
+                    self.table_widget.item(index, 3).setText(command)
+                    template = '{} erreicht {}%'
+                else:
+                    self.table_widget.item(index, 4).setText(command)
+                    template = '{}: {}'
+                self.console_output.setText(template.format(full_name, command))
+            else:
+                self.console_output.setText('Error: {}'.format(name))
+
+        except IndexError:
+            pass
+
+        self.console.clear()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
