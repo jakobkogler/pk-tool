@@ -33,6 +33,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_new.triggered.connect(lambda: self.open_file(self.files_combobox.currentIndex(), new=True))
         self.action_undo.triggered.connect(self.history_undo)
         self.action_redo.triggered.connect(self.history_redo)
+        self.action_add_student.triggered.connect(self.add_row)
 
     def find_files(self):
         r = re.compile('185\.A79 Programmkonstruktion .*_(.*?)_Überblick.txt')
@@ -46,6 +47,58 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         count = sum(chk.isChecked() for chk in self.checked_list)
         self.table_widget.setHorizontalHeaderItem(3, QTableWidgetItem('Anwesend {}/{}'.format(count,
                                                                                               len(self.checked_list))))
+
+    def add_row(self, student=None):
+        if not student:
+            self.write_lock = True
+
+        idx = self.table_widget.rowCount()
+        self.table_widget.setRowCount(idx + 1)
+
+        if student:
+            name_item = QTableWidgetItem(student.name)
+            name_item.setFlags(name_item.flags() & ~QtCore.Qt.ItemIsEditable)
+        else:
+            name_item = QTableWidgetItem()
+        self.table_widget.setItem(idx, 0, name_item)
+
+        if student:
+            matrikelnr_item = QTableWidgetItem(student.matrikelnr)
+            matrikelnr_item.setFlags(matrikelnr_item.flags() & ~QtCore.Qt.ItemIsEditable)
+        else:
+            matrikelnr_item = QTableWidgetItem()
+        matrikelnr_item.setTextAlignment(QtCore.Qt.AlignCenter)
+        self.table_widget.setItem(idx, 1, matrikelnr_item)
+
+        if student:
+            group_item = QTableWidgetItem(self.files_combobox.currentText())
+            group_item.setFlags(matrikelnr_item.flags() & ~QtCore.Qt.ItemIsEditable)
+        else:
+            group_item = QTableWidgetItem()
+        group_item.setTextAlignment(QtCore.Qt.AlignCenter)
+        self.table_widget.setItem(idx, 2, group_item)
+
+        check_item = QWidget()
+        chk_bx = QCheckBox()
+        chk_bx.setCheckState(QtCore.Qt.Unchecked)
+        chk_bx.stateChanged.connect(self.attendance_changed)
+        lay_out = QHBoxLayout(check_item)
+        lay_out.addWidget(chk_bx)
+        lay_out.setAlignment(QtCore.Qt.AlignCenter)
+        lay_out.setContentsMargins(0,0,0,0)
+        check_item.setLayout(lay_out)
+        self.checked_list.append(chk_bx)
+        self.table_widget.setCellWidget(idx, 3, check_item)
+
+        adhoc_item = QTableWidgetItem()
+        adhoc_item.setTextAlignment(QtCore.Qt.AlignCenter)
+        self.table_widget.setItem(idx, 4, adhoc_item)
+
+        self.table_widget.setItem(idx, 5, QTableWidgetItem())
+
+        if not student:
+            self.write_lock = False
+
     def open_file(self, index, new=False):
         if self.history_index != None and self.history_index != len(self.history_files) - 1:
             self.write_file(savefile=True)
@@ -63,45 +116,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.write_lock = True
         self.table_widget.clear()
         labels = 'Name;Matrikelnr.;Gruppe;Anwesend {:02}/{};Adhoc;Kommentar'.format(0, len(students)).split(';')
-        self.table_widget.setRowCount(len(students))
         self.table_widget.setColumnCount(len(labels))
         self.table_widget.setHorizontalHeaderLabels(labels)
 
         self.checked_list = []
 
-        for idx, student in enumerate(sorted(students, key=lambda s: s.matrikelnr)):
-            name_item = QTableWidgetItem(student.name)
-            name_item.setFlags(name_item.flags() & ~QtCore.Qt.ItemIsEditable)
-            self.table_widget.setItem(idx, 0, name_item)
-
-            matrikelnr_item = QTableWidgetItem(student.matrikelnr)
-            matrikelnr_item.setFlags(matrikelnr_item.flags() & ~QtCore.Qt.ItemIsEditable)
-            matrikelnr_item.setTextAlignment(QtCore.Qt.AlignCenter)
-            self.table_widget.setItem(idx, 1, matrikelnr_item)
-
-            group_item = QTableWidgetItem(self.files_combobox.currentText())
-            group_item.setFlags(matrikelnr_item.flags() & ~QtCore.Qt.ItemIsEditable)
-            group_item.setTextAlignment(QtCore.Qt.AlignCenter)
-            self.table_widget.setItem(idx, 2, group_item)
-
-
-            check_item = QWidget()
-            chk_bx = QCheckBox()
-            chk_bx.setCheckState(QtCore.Qt.Unchecked)
-            chk_bx.stateChanged.connect(self.attendance_changed)
-            lay_out = QHBoxLayout(check_item)
-            lay_out.addWidget(chk_bx)
-            lay_out.setAlignment(QtCore.Qt.AlignCenter)
-            lay_out.setContentsMargins(0,0,0,0)
-            check_item.setLayout(lay_out)
-            self.checked_list.append(chk_bx)
-            self.table_widget.setCellWidget(idx, 3, check_item)
-
-            adhoc_item = QTableWidgetItem()
-            adhoc_item.setTextAlignment(QtCore.Qt.AlignCenter)
-            self.table_widget.setItem(idx, 4, adhoc_item)
-
-            self.table_widget.setItem(idx, 5, QTableWidgetItem())
+        for student in sorted(students, key=lambda s: s.matrikelnr):
+            self.add_row(student)
 
         self.get_savefiles()
         self.history_index = len(self.history_files)
@@ -141,14 +162,20 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     adhoc = ''
                 comment = ' '.join(comment)
 
-                for idx in range(self.table_widget.rowCount()):
-                    if self.table_widget.item(idx, 1).text() == matrikelnr:
-                        self.table_widget.item(idx, 2).setText(group)
-                        self.checked_list[idx].setCheckState(QtCore.Qt.Checked if attendance == 'an' else
-                                                             QtCore.Qt.Unchecked)
-                        self.table_widget.item(idx, 4).setText(adhoc)
-                        self.table_widget.item(idx, 5).setText(comment)
-                        break
+                indices = [idx for idx in range(self.table_widget.rowCount())
+                           if self.table_widget.item(idx, 1).text() == matrikelnr]
+                if len(indices) == 1:
+                    idx = indices[0]
+                else:
+                    idx = self.table_widget.rowCount()
+                    self.add_row()
+
+                self.table_widget.item(idx, 1).setText(matrikelnr)
+                self.table_widget.item(idx, 2).setText(group)
+                self.checked_list[idx].setCheckState(QtCore.Qt.Checked if attendance == 'an' else
+                                                     QtCore.Qt.Unchecked)
+                self.table_widget.item(idx, 4).setText(adhoc)
+                self.table_widget.item(idx, 5).setText(comment)
 
         self.write_lock = False
 
@@ -171,13 +198,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         with io.open(file_name, 'w', encoding='utf-8', newline='') as f:
             f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
             for idx in range(self.table_widget.rowCount()):
-                f.write('{};{};{};{}% {}\n'.format(
-                    self.table_widget.item(idx, 1).text(),
-                    self.table_widget.item(idx, 2).text() or '0',
-                    'an' if self.checked_list[idx].isChecked() else 'ab',
-                    self.table_widget.item(idx, 4).text() or '0',
-                    self.table_widget.item(idx, 5).text()
-                ))
+                if self.table_widget.item(idx, 1).text():
+                    f.write('{};{};{};{}% {}\n'.format(
+                        self.table_widget.item(idx, 1).text(),
+                        self.table_widget.item(idx, 2).text() or '0',
+                        'an' if self.checked_list[idx].isChecked() else 'ab',
+                        self.table_widget.item(idx, 4).text() or '0',
+                        self.table_widget.item(idx, 5).text()
+                    ))
 
         self.history_files.append(file_name.lstrip('Saves/'))
         self.history_index = len(self.history_files) - 1

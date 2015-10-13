@@ -65,10 +65,13 @@ class Ui_MainWindow(object):
         self.action_undo.setObjectName("action_undo")
         self.action_redo = QtWidgets.QAction(MainWindow)
         self.action_redo.setObjectName("action_redo")
+        self.action_add_student = QtWidgets.QAction(MainWindow)
+        self.action_add_student.setObjectName("action_add_student")
         self.toolBar.addAction(self.action_new)
         self.toolBar.addAction(self.action_export)
         self.toolBar.addAction(self.action_undo)
         self.toolBar.addAction(self.action_redo)
+        self.toolBar.addAction(self.action_add_student)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -83,4 +86,5 @@ class Ui_MainWindow(object):
         self.action_new.setToolTip(_translate("MainWindow", "Neu"))
         self.action_undo.setText(_translate("MainWindow", "Zurück"))
         self.action_redo.setText(_translate("MainWindow", "Vor"))
+        self.action_add_student.setText(_translate("MainWindow", "Student hinzufügen"))
 

@@ -93,6 +93,7 @@
    <addaction name="action_export"/>
    <addaction name="action_undo"/>
    <addaction name="action_redo"/>
+   <addaction name="action_add_student"/>
   </widget>
   <action name="action_export">
    <property name="text">
@@ -115,6 +116,11 @@
   <action name="action_redo">
    <property name="text">
     <string>Vor</string>
+   </property>
+  </action>
+  <action name="action_add_student">
+   <property name="text">
+    <string>Student hinzufügen</string>
    </property>
   </action>
  </widget>
