@@ -1,8 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, \
-    QTableWidgetItem, QMessageBox, QPlainTextEdit, QShortcut, QCheckBox, QWidget, QHBoxLayout
-from PyQt5 import QtCore, QtGui
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QCheckBox, QWidget, QHBoxLayout
+from PyQt5 import QtCore
 from mainwindow import Ui_MainWindow
 import os
 import re
@@ -19,6 +17,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
+        self.name_files = []
         self.find_files()
         self.current_group_idx = 0
         self.write_lock = False
@@ -31,7 +30,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.console.returnPressed.connect(self.execute_console)
 
     def find_files(self):
-        r = re.compile('185\.A79 Programmkonstruktion \(VU 6,0\) 2015W_Übungsanmeldung \(.* Gruppen\)_(.*?)_Überblick.txt')
+        r = re.compile('185\.A79 Programmkonstruktion .*_(.*?)_Überblick.txt')
         matches = [r.search(f) for f in os.listdir('.')]
         self.name_files = [m.group(0) for m in matches if m]
         shortcuts = [m.group(1) for m in matches if m]
@@ -40,15 +39,15 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def open_file(self, index):
         if self.current_group_idx != index:
             really = QMessageBox.question(self, 'Öffnen',
-                            'Möchten Sie die Gruppe wechseln?\n Alle Änderungenen werden gelöscht!',
-                            QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+                                          'Möchten Sie die Gruppe wechseln?\n Alle Änderungenen werden gelöscht!',
+                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
             if really != QMessageBox.Yes:
                 self.files_combobox.setCurrentIndex(self.current_group_idx)
                 return
 
         self.current_group_idx = index
 
-        with open(self.name_files[index], 'r') as f:
+        with open(self.name_files[index], 'r', encoding='utf-8') as f:
             students = []
             r = re.compile('\s+✔\s+(\D+)\s(\d+)\s(.*)\s?')
             for line in f:
@@ -147,6 +146,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             pass
 
         self.console.clear()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
