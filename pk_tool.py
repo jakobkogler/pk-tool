@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QCheckBox, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, QHBoxLayout
 from PyQt5 import QtCore
 from mainwindow import Ui_MainWindow
 import os
@@ -153,7 +153,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
             file_name = 'Saves/{}_{}.csv'.format(group_name, now)
         else:
-            file_name = '{}.csv'.format(group_name)
+            file_name = QFileDialog.getSaveFileName(self, 'Export', group_name + '.csv', 'CSV (*.csv)')[0]
+            if not file_name:
+                return
 
         if not os.path.exists('Saves'):
             os.makedirs('Saves')

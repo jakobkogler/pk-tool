@@ -78,14 +78,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QToolBar" name="toolBar">
    <property name="windowTitle">
@@ -104,10 +96,7 @@
   </widget>
   <action name="action_export">
    <property name="text">
-    <string>Export</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
+    <string>Exportieren</string>
    </property>
   </action>
   <action name="action_new">
@@ -120,12 +109,12 @@
   </action>
   <action name="action_undo">
    <property name="text">
-    <string>Undo</string>
+    <string>Zurück</string>
    </property>
   </action>
   <action name="action_redo">
    <property name="text">
-    <string>Redo</string>
+    <string>Vor</string>
    </property>
   </action>
  </widget>
