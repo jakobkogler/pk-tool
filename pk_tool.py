@@ -18,6 +18,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         self.name_files = []
+        self.history_files = []
+        self.history_index = None
         self.find_files()
         self.current_group_idx = 0
         self.write_lock = False
@@ -28,6 +30,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_export.triggered.connect(lambda: self.write_file(savefile=False))
         self.table_widget.cellChanged.connect(lambda: self.write_file(savefile=True))
         self.console.returnPressed.connect(self.execute_console)
+        self.action_new.triggered.connect(lambda: self.open_file(self.files_combobox.currentIndex(), new=True))
+        self.action_undo.triggered.connect(self.history_undo)
+        self.action_redo.triggered.connect(self.history_redo)
 
     def find_files(self):
         r = re.compile('185\.A79 Programmkonstruktion .*_(.*?)_Überblick.txt')
@@ -36,14 +41,17 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         shortcuts = [m.group(1) for m in matches if m]
         self.files_combobox.addItems(shortcuts)
 
-    def open_file(self, index):
-        if self.current_group_idx != index:
-            really = QMessageBox.question(self, 'Öffnen',
-                                          'Möchten Sie die Gruppe wechseln?\n Alle Änderungenen werden gelöscht!',
-                                          QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
-            if really != QMessageBox.Yes:
-                self.files_combobox.setCurrentIndex(self.current_group_idx)
-                return
+    def open_file(self, index, new=False):
+        if self.history_index != None and self.history_index != len(self.history_files) - 1:
+            self.write_file(savefile=True)
+
+        # if self.current_group_idx != index:
+        #     really = QMessageBox.question(self, 'Öffnen',
+        #                                   'Möchten Sie die Gruppe wechseln?\n Alle Änderungenen werden gelöscht!',
+        #                                   QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+        #     if really != QMessageBox.Yes:
+        #         self.files_combobox.setCurrentIndex(self.current_group_idx)
+        #         return
 
         self.current_group_idx = index
 
@@ -64,7 +72,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.checked_list = []
 
-        for idx, student in enumerate(sorted(students)):
+        for idx, student in enumerate(sorted(students, key=lambda s: s.matrikelnr)):
             name_item = QTableWidgetItem(student.name)
             name_item.setFlags(name_item.flags() & ~QtCore.Qt.ItemIsEditable)
             self.table_widget.setItem(idx, 0, name_item)
@@ -86,22 +94,69 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.checked_list.append(chk_bx)
             self.table_widget.setCellWidget(idx, 2, check_item)
 
-            self.table_widget.setItem(idx, 3, QTableWidgetItem())
+            adhoc_item = QTableWidgetItem()
+            adhoc_item.setTextAlignment(QtCore.Qt.AlignCenter)
+            self.table_widget.setItem(idx, 3, adhoc_item)
 
             self.table_widget.setItem(idx, 4, QTableWidgetItem())
 
+        self.get_savefiles()
+        self.history_index = len(self.history_files)
+        if self.history_files and not new:
+            self.history_undo()
+            self.write_lock = False
+        else:
+            self.write_lock = False
+            self.write_file(savefile=True)
+
         self.table_widget.resizeColumnsToContents()
 
+    def get_savefiles(self):
+        current_group = self.files_combobox.currentText()
+        if os.path.exists('Saves'):
+            self.history_files = sorted(f for f in os.listdir('Saves') if f.startswith(current_group))
+
+    def history_undo(self):
+        if self.history_index:
+            self.history_index -= 1
+            self.history_load()
+
+    def history_redo(self):
+        if self.history_index < len(self.history_files) - 1:
+            self.history_index += 1
+            self.history_load()
+
+    def history_load(self):
+        self.write_lock = True
+        with open('Saves/' + self.history_files[self.history_index], 'r') as f:
+            next(f)
+            for line in f:
+                matrikelnr, group, attendance, comment = line.strip().split(';')
+                adhoc, *comment = comment.split()
+                adhoc = adhoc.strip('%')
+                comment = ' '.join(comment)
+
+                for idx in range(self.table_widget.rowCount()):
+                    if self.table_widget.item(idx, 1).text() == matrikelnr:
+                        self.checked_list[idx].setCheckState(QtCore.Qt.Checked if attendance == 'an' else
+                                                             QtCore.Qt.Unchecked)
+                        self.table_widget.item(idx, 3).setText(adhoc)
+                        self.table_widget.item(idx, 4).setText(comment)
         self.write_lock = False
 
     def write_file(self, savefile=True):
         if self.write_lock:
             return
+
+        group_name = self.files_combobox.itemText(self.current_group_idx)
         if savefile:
             now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-            file_name = 'Saves/{}_{}.csv'.format(self.files_combobox.currentText(), now)
+            file_name = 'Saves/{}_{}.csv'.format(group_name, now)
         else:
-            file_name = '{}.csv'.format(self.files_combobox.currentText())
+            file_name = '{}.csv'.format(group_name)
+
+        if not os.path.exists('Saves'):
+            os.makedirs('Saves')
 
         with io.open(file_name, 'w', encoding='utf-8', newline='') as f:
             f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
@@ -113,6 +168,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     self.table_widget.item(idx, 3).text() or '0',
                     self.table_widget.item(idx, 4).text()
                 ))
+
+        self.history_files.append(file_name.lstrip('Saves/'))
+        self.history_index = len(self.history_files) - 1
 
     def find_index(self, name):
         indices = [i for i in range(self.table_widget.rowCount())

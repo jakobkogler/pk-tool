@@ -97,7 +97,10 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_new"/>
    <addaction name="action_export"/>
+   <addaction name="action_undo"/>
+   <addaction name="action_redo"/>
   </widget>
   <action name="action_export">
    <property name="text">
@@ -105,6 +108,24 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_new">
+   <property name="text">
+    <string>Neu</string>
+   </property>
+   <property name="toolTip">
+    <string>Neu</string>
+   </property>
+  </action>
+  <action name="action_undo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+  </action>
+  <action name="action_redo">
+   <property name="text">
+    <string>Redo</string>
    </property>
   </action>
  </widget>
