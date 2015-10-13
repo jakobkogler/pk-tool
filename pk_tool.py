@@ -41,6 +41,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         shortcuts = [m.group(1) for m in matches if m]
         self.files_combobox.addItems(shortcuts)
 
+    def attendance_changed(self):
+        self.write_file(savefile=True)
+        count = sum(chk.isChecked() for chk in self.checked_list)
+        self.table_widget.setHorizontalHeaderItem(2, QTableWidgetItem('Anwesend {}/{}'.format(count,
+                                                                                              len(self.checked_list))))
+
+
     def open_file(self, index, new=False):
         if self.history_index != None and self.history_index != len(self.history_files) - 1:
             self.write_file(savefile=True)
@@ -65,7 +72,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.write_lock = True
         self.table_widget.clear()
-        labels = 'Name Matrikelnr. Anwesend Adhoc Kommentar'.split()
+        labels = 'Name;Matrikelnr.;Anwesend {:02}/{};Adhoc;Kommentar'.format(0, len(students)).split(';')
         self.table_widget.setRowCount(len(students))
         self.table_widget.setColumnCount(len(labels))
         self.table_widget.setHorizontalHeaderLabels(labels)
@@ -85,7 +92,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             check_item = QWidget()
             chk_bx = QCheckBox()
             chk_bx.setCheckState(QtCore.Qt.Unchecked)
-            chk_bx.stateChanged.connect(lambda: self.write_file(savefile=True))
+            chk_bx.stateChanged.connect(self.attendance_changed)
             lay_out = QHBoxLayout(check_item)
             lay_out.addWidget(chk_bx)
             lay_out.setAlignment(QtCore.Qt.AlignCenter)
