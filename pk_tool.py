@@ -44,21 +44,11 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def attendance_changed(self):
         self.write_file(savefile=True)
         count = sum(chk.isChecked() for chk in self.checked_list)
-        self.table_widget.setHorizontalHeaderItem(2, QTableWidgetItem('Anwesend {}/{}'.format(count,
+        self.table_widget.setHorizontalHeaderItem(3, QTableWidgetItem('Anwesend {}/{}'.format(count,
                                                                                               len(self.checked_list))))
-
-
     def open_file(self, index, new=False):
         if self.history_index != None and self.history_index != len(self.history_files) - 1:
             self.write_file(savefile=True)
-
-        # if self.current_group_idx != index:
-        #     really = QMessageBox.question(self, 'Öffnen',
-        #                                   'Möchten Sie die Gruppe wechseln?\n Alle Änderungenen werden gelöscht!',
-        #                                   QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
-        #     if really != QMessageBox.Yes:
-        #         self.files_combobox.setCurrentIndex(self.current_group_idx)
-        #         return
 
         self.current_group_idx = index
 
@@ -72,7 +62,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.write_lock = True
         self.table_widget.clear()
-        labels = 'Name;Matrikelnr.;Anwesend {:02}/{};Adhoc;Kommentar'.format(0, len(students)).split(';')
+        labels = 'Name;Matrikelnr.;Gruppe;Anwesend {:02}/{};Adhoc;Kommentar'.format(0, len(students)).split(';')
         self.table_widget.setRowCount(len(students))
         self.table_widget.setColumnCount(len(labels))
         self.table_widget.setHorizontalHeaderLabels(labels)
@@ -89,6 +79,12 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             matrikelnr_item.setTextAlignment(QtCore.Qt.AlignCenter)
             self.table_widget.setItem(idx, 1, matrikelnr_item)
 
+            group_item = QTableWidgetItem(self.files_combobox.currentText())
+            group_item.setFlags(matrikelnr_item.flags() & ~QtCore.Qt.ItemIsEditable)
+            group_item.setTextAlignment(QtCore.Qt.AlignCenter)
+            self.table_widget.setItem(idx, 2, group_item)
+
+
             check_item = QWidget()
             chk_bx = QCheckBox()
             chk_bx.setCheckState(QtCore.Qt.Unchecked)
@@ -99,13 +95,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             lay_out.setContentsMargins(0,0,0,0)
             check_item.setLayout(lay_out)
             self.checked_list.append(chk_bx)
-            self.table_widget.setCellWidget(idx, 2, check_item)
+            self.table_widget.setCellWidget(idx, 3, check_item)
 
             adhoc_item = QTableWidgetItem()
             adhoc_item.setTextAlignment(QtCore.Qt.AlignCenter)
-            self.table_widget.setItem(idx, 3, adhoc_item)
+            self.table_widget.setItem(idx, 4, adhoc_item)
 
-            self.table_widget.setItem(idx, 4, QTableWidgetItem())
+            self.table_widget.setItem(idx, 5, QTableWidgetItem())
 
         self.get_savefiles()
         self.history_index = len(self.history_files)
@@ -141,14 +137,19 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 matrikelnr, group, attendance, comment = line.strip().split(';')
                 adhoc, *comment = comment.split()
                 adhoc = adhoc.strip('%')
+                if adhoc == '0':
+                    adhoc = ''
                 comment = ' '.join(comment)
 
                 for idx in range(self.table_widget.rowCount()):
                     if self.table_widget.item(idx, 1).text() == matrikelnr:
+                        self.table_widget.item(idx, 2).setText(group)
                         self.checked_list[idx].setCheckState(QtCore.Qt.Checked if attendance == 'an' else
                                                              QtCore.Qt.Unchecked)
-                        self.table_widget.item(idx, 3).setText(adhoc)
-                        self.table_widget.item(idx, 4).setText(comment)
+                        self.table_widget.item(idx, 4).setText(adhoc)
+                        self.table_widget.item(idx, 5).setText(comment)
+                        break
+
         self.write_lock = False
 
     def write_file(self, savefile=True):
@@ -172,10 +173,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             for idx in range(self.table_widget.rowCount()):
                 f.write('{};{};{};{}% {}\n'.format(
                     self.table_widget.item(idx, 1).text(),
-                    self.files_combobox.currentText(),
+                    self.table_widget.item(idx, 2).text() or '0',
                     'an' if self.checked_list[idx].isChecked() else 'ab',
-                    self.table_widget.item(idx, 3).text() or '0',
-                    self.table_widget.item(idx, 4).text()
+                    self.table_widget.item(idx, 4).text() or '0',
+                    self.table_widget.item(idx, 5).text()
                 ))
 
         self.history_files.append(file_name.lstrip('Saves/'))
@@ -184,14 +185,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def find_index(self, name):
         indices = [i for i in range(self.table_widget.rowCount())
                    if name.lower() in self.table_widget.item(i, 0).text().lower()]
-        return indices[0] if len(indices) == 1 else None
+        return indices[0] if len(indices) == 1 else indices
 
     def execute_console(self):
         try:
             commands = self.console.text().split(' ')
             name, command = commands[0], ' '.join(commands[1:])
             index = self.find_index(name)
-            if index is not None:
+            if isinstance(index, int):
                 full_name = self.table_widget.item(index, 0).text()
                 if command == 'a':
                     self.checked_list[index].setCheckState(QtCore.Qt.Checked)
@@ -200,14 +201,18 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     self.checked_list[index].setCheckState(QtCore.Qt.Unchecked)
                     template = '{} ist nicht anwesend'
                 elif command.isdigit():
-                    self.table_widget.item(index, 3).setText(command)
+                    self.table_widget.item(index, 4).setText(command)
                     template = '{} erreicht {}%'
                 else:
-                    self.table_widget.item(index, 4).setText(command)
+                    self.table_widget.item(index, 5).setText(command)
                     template = '{}: {}'
                 self.console_output.setText(template.format(full_name, command))
             else:
-                self.console_output.setText('Error: {}'.format(name))
+                if len(index) == 0:
+                    error = 'Der Student "{}" wurde nicht gefunden.'
+                else:
+                    error = 'Mehrere Studenten treffen auf "{}" zu.'
+                self.console_output.setText('Error: ' + error.format(name))
 
         except IndexError:
             pass
