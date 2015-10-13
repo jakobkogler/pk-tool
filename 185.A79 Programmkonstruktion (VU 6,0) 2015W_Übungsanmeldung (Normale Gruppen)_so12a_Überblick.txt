@@ -1,0 +1,21 @@
+*** Status
+
+***	✔ angemeldet in Moodle-Gruppe und Gruppenverwaltung
+***	? angemeldet in Moodle-Gruppe, nicht aber in der Gruppenverwaltung
+***	+ angemeldet in der Gruppenverwaltung, nicht aber in Moodle-Gruppe
+***	1, 2, 3... auf Warteliste in der Gruppenverwaltung
+***	
+
+mi13b
+	Insgesamt 26 / Angemeldet 8 / In Warteliste 0 / Frei 0
+	Anmeldungen
+		✔	Dennis T. Odom	0000000	e0000000@student.tuwien.ac.at
+		✔	Malcolm Key	1111111	e1111111@student.tuwien.ac.at
+		✔	Judah Whitehead	2222222	e2222222@student.tuwien.ac.at
+		✔	Kellie Townsend	3333333	e3333333@student.tuwien.ac.at
+		✔	Wesley Clark	4444444	e4444444@student.tuwien.ac.at
+		✔	Natalie K. Calderon	5555555	e5555555@student.tuwien.ac.at
+		✔	Hayden U. Perkins	6666666	e6666666student.tuwien.ac.at
+		✔	Madaline S. Warren	7777777	e7777777@student.tuwien.ac.at
+		✔	Barrett T. Merritt	8888888	e8888888@student.tuwien.ac.at
+		--Keine Wartelisteneinträge--
