@@ -104,6 +104,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.write_file(savefile=True)
 
         self.current_group_idx = index
+        self.history_index = None
 
         with open(self.name_files[index], 'r', encoding='utf-8') as f:
             students = []
@@ -117,6 +118,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.clear()
         labels = 'Name;Matrikelnr.;Gruppe;Anwesend {:02}/{};Adhoc;Kommentar'.format(0, len(students)).split(';')
         self.table_widget.setColumnCount(len(labels))
+        self.table_widget.setRowCount(0)
         self.table_widget.setHorizontalHeaderLabels(labels)
 
         self.checked_list = []
@@ -207,7 +209,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                         self.table_widget.item(idx, 5).text()
                     ))
 
-        self.history_files.append(file_name.lstrip('Saves/'))
+        self.history_files.append(file_name[6:])
         self.history_index = len(self.history_files) - 1
 
     def find_index(self, name):
