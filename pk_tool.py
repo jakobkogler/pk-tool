@@ -190,7 +190,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
             file_name = 'Saves/{}_{}.csv'.format(group_name, now)
         else:
-            file_name = QFileDialog.getSaveFileName(self, 'Export', group_name + '.csv', 'CSV (*.csv)')[0]
+            file_name = QFileDialog.getSaveFileName(self, 'Export', group_name + '_ueX.csv', 'CSV (*.csv)')[0]
             if not file_name:
                 return
 
