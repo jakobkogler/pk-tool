@@ -88,6 +88,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "PK Übungstool"))
         self.label.setText(_translate("MainWindow", "Gruppe: "))
+        self.table_widget.setSortingEnabled(True)
         self.label_2.setText(_translate("MainWindow", "Befehl: "))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.action_export.setText(_translate("MainWindow", "Exportieren"))
