@@ -53,6 +53,10 @@ Diese History-Funktion ist aber nicht besonders intelligent.
 
 Per Button-Click werden alle Tabelleneinträge gelöscht. Kann man per History-Funktion auch rückgängig machen. 
 
+## Sortieren
+
+Jede Spalte kann per Click auf die Spaltenüberschrift sortiert werden.  
+
 ### Neue Studenten der Tabelle hinzufügen
 
 Falls ein Student nicht in der Tabelle erscheint (z.B. weil er aus einer anderen Gruppe ist), kann man per Button-Click eine neue Zeile der Tabelle hinzufügen. 
