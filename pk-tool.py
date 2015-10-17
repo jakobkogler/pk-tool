@@ -120,7 +120,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.setRowCount(0)
         self.table_widget.setHorizontalHeaderLabels(labels)
 
-        for student in sorted(students, key=lambda s: s.matrikelnr):
+        for student in students:
             self.add_row(student)
 
         self.get_savefiles()
@@ -133,6 +133,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.write_file(savefile=True)
 
         self.table_widget.resizeColumnsToContents()
+        self.table_widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
     def get_savefiles(self):
         current_group = self.files_combobox.currentText()
