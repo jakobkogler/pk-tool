@@ -23,7 +23,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.find_files()
         self.current_group_idx = 0
         self.write_lock = False
-        self.checked_list = []
         self.open_file(0)
 
         self.files_combobox.currentIndexChanged.connect(self.open_file)
@@ -44,9 +43,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
     def attendance_changed(self):
         self.write_file(savefile=True)
-        count = sum(chk.isChecked() for chk in self.checked_list)
-        self.table_widget.setHorizontalHeaderItem(3, QTableWidgetItem('Anwesend {}/{}'.format(count,
-                                                                                              len(self.checked_list))))
+        count = sum(self.get_checkbox(index).isChecked() for index in range(self.table_widget.rowCount()))
+        attendance = 'Anwesend {}/{}'.format(count, self.table_widget.rowCount())
+        self.table_widget.setHorizontalHeaderItem(3, QTableWidgetItem(attendance))
 
     def add_row(self, student=None):
         if not student:
@@ -87,8 +86,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         lay_out.setAlignment(QtCore.Qt.AlignCenter)
         lay_out.setContentsMargins(0,0,0,0)
         check_item.setLayout(lay_out)
-        self.checked_list.append(chk_bx)
         self.table_widget.setCellWidget(idx, 3, check_item)
+        ckb = self.table_widget.cellWidget(idx, 3).layout().itemAt(0)
 
         adhoc_item = QTableWidgetItem()
         adhoc_item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -120,8 +119,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.setColumnCount(len(labels))
         self.table_widget.setRowCount(0)
         self.table_widget.setHorizontalHeaderLabels(labels)
-
-        self.checked_list = []
 
         for student in sorted(students, key=lambda s: s.matrikelnr):
             self.add_row(student)
@@ -174,7 +171,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
                 self.table_widget.item(idx, 1).setText(matrikelnr)
                 self.table_widget.item(idx, 2).setText(group)
-                self.checked_list[idx].setCheckState(QtCore.Qt.Checked if attendance == 'an' else
+                self.get_checkbox(idx).setCheckState(QtCore.Qt.Checked if attendance == 'an' else
                                                      QtCore.Qt.Unchecked)
                 self.table_widget.item(idx, 4).setText(adhoc)
                 self.table_widget.item(idx, 5).setText(comment)
@@ -204,13 +201,16 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     f.write('{};{};{};{}% {}\n'.format(
                         self.table_widget.item(idx, 1).text(),
                         self.table_widget.item(idx, 2).text() or '0',
-                        'an' if self.checked_list[idx].isChecked() else 'ab',
+                        'an' if self.get_checkbox(idx).isChecked() else 'ab',
                         self.table_widget.item(idx, 4).text() or '0',
                         self.table_widget.item(idx, 5).text()
                     ))
 
         self.history_files.append(file_name[6:])
         self.history_index = len(self.history_files) - 1
+
+    def get_checkbox(self, index):
+        return self.table_widget.cellWidget(index, 3).layout().itemAt(0).widget()
 
     def find_index(self, name):
         indices = [i for i in range(self.table_widget.rowCount())
@@ -225,10 +225,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             if isinstance(index, int):
                 full_name = self.table_widget.item(index, 0).text()
                 if command == 'a':
-                    self.checked_list[index].setCheckState(QtCore.Qt.Checked)
+                    self.get_checkbox(index).setCheckState(QtCore.Qt.Checked)
                     template = '{} ist anwesend'
                 elif command == 'b':
-                    self.checked_list[index].setCheckState(QtCore.Qt.Unchecked)
+                    self.get_checkbox(index).setCheckState(QtCore.Qt.Unchecked)
                     template = '{} ist nicht anwesend'
                 elif command.isdigit():
                     self.table_widget.item(index, 4).setText(command)
