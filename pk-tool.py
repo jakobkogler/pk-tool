@@ -77,16 +77,20 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         group_item.setTextAlignment(QtCore.Qt.AlignCenter)
         self.table_widget.setItem(idx, 2, group_item)
 
-        check_item = QWidget()
+        check_item = QTableWidgetItem()
+        check_item.setTextAlignment(QtCore.Qt.AlignCenter)
+        self.table_widget.setItem(idx, 3, check_item)
+        check_widget = QWidget()
         chk_bx = QCheckBox()
         chk_bx.setCheckState(QtCore.Qt.Unchecked)
         chk_bx.stateChanged.connect(self.attendance_changed)
-        lay_out = QHBoxLayout(check_item)
+        chk_bx.clicked.connect(self.update_checkbox_data)
+        lay_out = QHBoxLayout(check_widget)
         lay_out.addWidget(chk_bx)
         lay_out.setAlignment(QtCore.Qt.AlignCenter)
         lay_out.setContentsMargins(0,0,0,0)
-        check_item.setLayout(lay_out)
-        self.table_widget.setCellWidget(idx, 3, check_item)
+        check_widget.setLayout(lay_out)
+        self.table_widget.setCellWidget(idx, 3, check_widget)
         ckb = self.table_widget.cellWidget(idx, 3).layout().itemAt(0)
 
         adhoc_item = QTableWidgetItem()
@@ -99,7 +103,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.write_lock = False
 
     def open_file(self, index, new=False):
-        if self.history_index != None and self.history_index != len(self.history_files) - 1:
+        if self.history_index is not None and self.history_index != len(self.history_files) - 1:
             self.write_file(savefile=True)
 
         self.current_group_idx = index
@@ -132,8 +136,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.write_lock = False
             self.write_file(savefile=True)
 
+        self.update_checkbox_data()
         self.table_widget.resizeColumnsToContents()
         self.table_widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
+
+    def update_checkbox_data(self):
+        for idx in range(self.table_widget.rowCount()):
+            self.table_widget.item(idx, 3).setData(0, int(self.get_checkbox(idx).isChecked()))
 
     def get_savefiles(self):
         current_group = self.files_combobox.currentText()
