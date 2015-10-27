@@ -163,6 +163,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
     def history_load(self):
         self.write_lock = True
+        self.table_widget.setSortingEnabled(False)
         with open('Saves/' + self.history_files[self.history_index], 'r') as f:
             next(f)
             for line in f:
@@ -187,7 +188,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                                                      QtCore.Qt.Unchecked)
                 self.table_widget.item(idx, 4).setText(adhoc)
                 self.table_widget.item(idx, 5).setText(comment)
-
+        self.table_widget.setSortingEnabled(True)
         self.write_lock = False
 
     def write_file(self, savefile=True):
