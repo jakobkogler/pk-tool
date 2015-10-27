@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, QHBoxLayout
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, QHBoxLayout, QMessageBox
 from PyQt5 import QtCore
 from mainwindow import Ui_MainWindow
 import os
@@ -23,7 +23,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.find_files()
         self.current_group_idx = 0
         self.write_lock = False
-        self.open_file(0)
+        if self.name_files:
+            self.open_file(0)
+        else:
+            QMessageBox().about(self, 'Keine Teilnehmerlisten gefunden',
+                                '\n'.join(['Um das Programm verwenden zu können, müssen Sie zuerst die Teilnehmerlisten',
+                                           'von Tuwel downloaden und in dieses Verzeichnis kopieren. Die findet man unter',
+                                           '"Programmkonstruktion - Anmeldungen - Übungsanmeldung (Normale Gruppen) - Teilnehmer/innen". ',
+                                           'Dort bei den jeweiligen Gruppen die .txt (z.B. 185.A79...Überblick.txt) nehmen.']))
 
         self.files_combobox.currentIndexChanged.connect(self.open_file)
         self.action_export.triggered.connect(lambda: self.write_file(savefile=False))
