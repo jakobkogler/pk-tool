@@ -4,6 +4,10 @@ Eine nette Gui, die PK-Tutoren während der Übungen unterstützen soll.
 
 ![Screenshot](https://raw.githubusercontent.com/jakobkogler/pk-tool/master/screenshot.png)
 
+## Download
+
+Kompilierte Version für Windows 10 (und niedriger?): [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.1/pk-tool.exe)
+
 ## Voraussetzungen ##
 
 * Python 3.4
@@ -11,7 +15,7 @@ Eine nette Gui, die PK-Tutoren während der Übungen unterstützen soll.
 
 ## Benutzung ##
 
-Zuerst benötigt man die Teilneherlisten von Tuwel. 
+Zuerst benötigt man die Teilnehmerlisten von Tuwel. 
 Zu finden sind die unter Programmkonstruktion - Anmeldungen - Übungsanmeldung (Normale Gruppen) - Teilnehmer/innen. 
 Dort bei den jeweiligen Gruppen die `.txt` (z.B. `185.A79 Programmkon...so12a_Überblick.txt`) runterladen und direkt neben die `pk-tool.py` ablegen. 
 
