@@ -122,6 +122,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         labels = 'Name;Matrikelnr.;Gruppe;Anwesend {:02}/{};Adhoc;Kommentar'.format(0, len(students)).split(';')
         self.table_widget.setColumnCount(len(labels))
         self.table_widget.setRowCount(0)
+        self.table_widget.setSortingEnabled(False)
         self.table_widget.setHorizontalHeaderLabels(labels)
 
         for student in students:
@@ -138,6 +139,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.update_checkbox_data()
         self.table_widget.resizeColumnsToContents()
+        self.table_widget.setSortingEnabled(True)
         self.table_widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
     def update_checkbox_data(self):
@@ -172,7 +174,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 comment = ' '.join(comment)
 
                 indices = [idx for idx in range(self.table_widget.rowCount())
-                           if self.table_widget.item(idx, 1).text() == matrikelnr]
+                               if self.table_widget.item(idx, 1).text() == matrikelnr]
                 if len(indices) == 1:
                     idx = indices[0]
                 else:
