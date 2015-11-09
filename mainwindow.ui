@@ -14,34 +14,34 @@
    <string>PK Übungstool</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2">
+   <layout class="QGridLayout" name="gridLayout_2" rowstretch="1,99,1">
+    <property name="horizontalSpacing">
+     <number>6</number>
+    </property>
+    <property name="verticalSpacing">
+     <number>0</number>
+    </property>
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox_2">
       <property name="title">
        <string>Gruppenauswahl:</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="label_repo_path">
-           <property name="text">
-            <string>Pfad zum PK-Repo:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="line_edit_repo_path"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="button_select_repo_path">
-           <property name="text">
-            <string>Auswählen</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>3</number>
+       </property>
+       <property name="rightMargin">
+        <number>3</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
@@ -53,16 +53,6 @@
          </item>
          <item>
           <widget class="QComboBox" name="group_type_combobox"/>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_day">
-           <property name="text">
-            <string>Übungstag:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="group_day_combobox"/>
          </item>
          <item>
           <widget class="QLabel" name="label_group">
@@ -102,6 +92,24 @@
        <string>Gruppen-Info:</string>
       </property>
       <layout class="QGridLayout" name="gridLayout_3">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>3</number>
+       </property>
+       <property name="rightMargin">
+        <number>3</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <property name="horizontalSpacing">
+        <number>6</number>
+       </property>
+       <property name="verticalSpacing">
+        <number>1</number>
+       </property>
        <item row="1" column="1">
         <widget class="QLabel" name="label_tutor1_name">
          <property name="text">
@@ -192,23 +200,24 @@
      <height>27</height>
     </rect>
    </property>
-  </widget>
-  <widget class="QStatusBar" name="statusBar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="action_new"/>
-   <addaction name="action_export"/>
-   <addaction name="action_undo"/>
-   <addaction name="action_redo"/>
-   <addaction name="action_add_student"/>
+   <widget class="QMenu" name="menuDatei">
+    <property name="title">
+     <string>Datei</string>
+    </property>
+    <addaction name="action_new"/>
+    <addaction name="action_export"/>
+    <addaction name="action_settings"/>
+   </widget>
+   <widget class="QMenu" name="menuBearbeiten">
+    <property name="title">
+     <string>Bearbeiten</string>
+    </property>
+    <addaction name="action_undo"/>
+    <addaction name="action_redo"/>
+    <addaction name="action_add_student"/>
+   </widget>
+   <addaction name="menuDatei"/>
+   <addaction name="menuBearbeiten"/>
   </widget>
   <action name="action_export">
    <property name="text">
@@ -236,6 +245,11 @@
   <action name="action_add_student">
    <property name="text">
     <string>Student hinzufügen</string>
+   </property>
+  </action>
+  <action name="action_settings">
+   <property name="text">
+    <string>Einstellungen</string>
    </property>
   </action>
  </widget>

@@ -1,8 +1,10 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, QHBoxLayout, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
+    QHBoxLayout, QMessageBox
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
 from mainwindow import Ui_MainWindow
+from settings import Ui_SettingsDialog
 import os
 import re
 import io
@@ -10,7 +12,7 @@ from collections import namedtuple
 from _datetime import datetime
 
 GroupInfos = namedtuple('GroupInfos', 'instructor, tutor1, tutor2')
-Group = namedtuple('Group', 'day name type students')
+Group = namedtuple('Group', 'name type students')
 Student = namedtuple('Student', 'name matrikelnr email')
 
 
@@ -19,14 +21,16 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
-        self.name_files = []
-        self.history_files = []
-        self.history_index = None
+        # self.name_files = []
+        self.group_infos = dict()
+        self.groups = []
+        # self.history_files = []
+        # self.history_index = None
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
-        self.line_edit_repo_path.setText(pk_repo_path)
         if pk_repo_path:
+            self.get_group_infos()
             self.read_group_files()
 
         # self.find_files()
@@ -49,14 +53,18 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         # self.action_undo.triggered.connect(self.history_undo)
         # self.action_redo.triggered.connect(self.history_redo)
         # self.action_add_student.triggered.connect(self.add_row)
-        self.button_select_repo_path.clicked.connect(self.select_repo_path)
+
+        self.action_settings.triggered.connect(self.open_settings)
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
-        self.group_day_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
         self.group_combobox.currentIndexChanged.connect(self.load_group_data)
 
+    def open_settings(self):
+        settings_dialog = SettingsDialog(self.settings, self.group_infos)
+        settings_dialog.exec_()
+        self.fill_group_names_combobox()
+
     def read_group_files(self):
-        path_template = self.line_edit_repo_path.text() + '/Anwesenheiten/Anmeldung/groups_{group_type}.txt'
-        self.groups = []
+        path_template = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Anmeldung/groups_{group_type}.txt'
 
         for group_type in 'fortgeschritten', 'normal':
             with open(path_template.format(group_type=group_type), 'r', encoding='utf-8') as f:
@@ -72,28 +80,23 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
                     if group_name_match:
                         if students:
-                            self.groups.append(Group(group_name[:2], group_name[2:], group_type, students))
+                            self.groups.append(Group(group_name, group_type, students))
                             students = []
                         group_name = group_name_match.group(0)
                     elif students_match:
                         students.append(Student(*(students_match.group(i) for i in range(1, 4))))
 
             if students:
-                self.groups.append(Group(group_name[:2], group_name[2:], group_type, students))
+                self.groups.append(Group(group_name, group_type, students))
 
-        self.get_group_infos()
-
-        self.group_type_combobox.addItems('Alle Normal Fortgeschritten'.split())
-        self.group_day_combobox.addItems('mo di mi do fr'.split())
+        self.group_type_combobox.addItems('Alle Normal Fortgeschritten Meine'.split())
         self.fill_group_names_combobox()
         self.load_group_data()
 
     def get_group_infos(self):
-        path = self.line_edit_repo_path.text() + '/GRUPPEN.txt'
+        path = self.settings.value('Path/pk_repo', '') + '/GRUPPEN.txt'
 
         group_name_regex = re.compile('(mo|di|mi|do|fr)\d{2}\w')
-
-        self.group_infos = dict()
 
         with open(path, 'r', encoding='utf-8') as f:
             group_name = ''
@@ -122,18 +125,23 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def fill_group_names_combobox(self):
         type_index = self.group_type_combobox.currentIndex()
         allowed_types = []
-        if type_index != 1:
-            allowed_types.append('fortgeschritten')
-        if type_index != 2:
-            allowed_types.append('normal')
 
-        group_names = [group.name for group in self.groups
-                  if group.type in allowed_types and group.day == self.group_day_combobox.currentText()]
+        if type_index < 3:
+            if type_index != 1:
+                allowed_types.append('fortgeschritten')
+            if type_index != 2:
+                allowed_types.append('normal')
+            group_names = [group.name for group in self.groups if group.type in allowed_types]
+        else:
+            username = self.settings.value('Personal/username', '')
+            group_names = [group.name for group in self.groups if self.group_infos[group.name].tutor1 == username or
+                           self.group_infos[group.name].tutor2 == username]
+
         self.group_combobox.clear()
         self.group_combobox.addItems(group_names)
 
     def load_group_data(self):
-        group_name = self.group_day_combobox.currentText() + self.group_combobox.currentText()
+        group_name = self.group_combobox.currentText()
         try:
             infos = self.group_infos[group_name]
             self.label_instructor_name.setText(infos.instructor)
@@ -141,12 +149,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.label_tutor2_name.setText(infos.tutor2)
         except KeyError:
             return
-
-    def select_repo_path(self):
-        pk_repo_path = QFileDialog.getExistingDirectory(self, 'Pfad zum PK-Repository', self.line_edit_repo_path.text(), QFileDialog.ShowDirsOnly)
-        if pk_repo_path:
-            self.settings.setValue('Path/pk_repo', pk_repo_path)
-            self.line_edit_repo_path.setText(pk_repo_path)
 
     def find_files(self):
         r = re.compile('185\.A79 Programmkonstruktion .*_(.*?)_Überblick.txt')
@@ -337,7 +339,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.history_index = len(self.history_files) - 1
 
     def get_checkbox(self, index):
-        return self.table_widget.cellWidget(index, 3).layout().itemAt(0).widget()
+        return self.table_wdget.cellWidget(index, 3).layout().itemAt(0).widget()
 
     def find_index(self, name):
         indices = [i for i in range(self.table_widget.rowCount())
@@ -375,6 +377,37 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             pass
 
         self.console.clear()
+
+
+class SettingsDialog(QDialog, Ui_SettingsDialog):
+    def __init__(self, settings, group_infos):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+        self.settings = settings
+        pk_repo_path = self.settings.value('Path/pk_repo', '')
+        self.line_edit_repo_path.setText(pk_repo_path)
+
+        tutor_names = sorted(set([''] + [group.tutor1 for group in group_infos.values()] +
+                                 [group.tutor2 for group in group_infos.values()]))
+        self.username_combobox.addItems(tutor_names)
+        tutor_name = self.settings.value('Personal/username', '')
+        try:
+            self.username_combobox.setCurrentIndex(tutor_names.index(tutor_name))
+        except ValueError:
+            pass
+
+        self.button_select_repo_path.clicked.connect(self.select_repo_path)
+        self.buttonBox.accepted.connect(self.accept_settings)
+
+    def select_repo_path(self):
+        pk_repo_path = QFileDialog.getExistingDirectory(self, 'Pfad zum PK-Repository', self.line_edit_repo_path.text(), QFileDialog.ShowDirsOnly)
+        if pk_repo_path:
+            self.line_edit_repo_path.setText(pk_repo_path)
+
+    def accept_settings(self):
+        self.settings.setValue('Path/pk_repo', self.line_edit_repo_path.text())
+        self.settings.setValue('Personal/username', self.username_combobox.currentText())
 
 
 if __name__ == '__main__':
