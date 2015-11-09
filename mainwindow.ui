@@ -80,7 +80,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="file_combobox"/>
+        <widget class="QComboBox" name="file_combobox">
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToContents</enum>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -156,19 +160,6 @@
        </item>
       </layout>
      </widget>
-    </item>
-    <item row="0" column="3">
-     <spacer name="horizontalSpacer">
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
     </item>
     <item row="1" column="0" colspan="4">
      <widget class="QTableWidget" name="table_widget">
@@ -247,8 +238,15 @@
     <addaction name="action_redo"/>
     <addaction name="action_add_student"/>
    </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>?</string>
+    </property>
+    <addaction name="action_about"/>
+   </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuBearbeiten"/>
+   <addaction name="menu"/>
   </widget>
   <action name="action_new">
    <property name="text">
@@ -276,6 +274,11 @@
   <action name="action_settings">
    <property name="text">
     <string>Einstellungen</string>
+   </property>
+  </action>
+  <action name="action_about">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>
