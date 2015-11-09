@@ -23,13 +23,17 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_infos = dict()
         self.groups = dict()
         self.csv_files = dict()
+        self.current_data = []
+        self.history = []
+        self.history_foreward = []
         self.write_lock = False
 
         self.table_widget.cellChanged.connect(self.export_csv)
         self.console.returnPressed.connect(self.execute_console)
         self.action_new.triggered.connect(self.new_csv)
         self.action_add_student.triggered.connect(self.new_student)
-
+        self.action_undo.triggered.connect(self.undo_history)
+        self.action_redo.triggered.connect(lambda: self.undo_history(True))
         self.action_settings.triggered.connect(self.open_settings)
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
         self.group_combobox.currentIndexChanged.connect(self.populate_files)
@@ -154,8 +158,11 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             student = self.get_student(matrikelnr)
             if student:
                 self.add_row_to_table(student)
+                text = '{} hinzugefügt'.format(student.name)
+                self.add_new_history((matrikelnr, text, 1, None, student))
         self.table_widget.setSortingEnabled(True)
         self.write_lock = False
+
 
     def load_group_data(self):
         """Load all data for a specific group.
@@ -171,6 +178,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             pass
 
         self.write_lock = True
+        self.history = []
+        self.history_foreward = []
         self.table_widget.clear()
         self.table_widget.setRowCount(0)
 
@@ -192,6 +201,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.setSortingEnabled(True)
         self.table_widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
         self.write_lock = False
+        self.current_data = self.get_data()
+        self.show_last_history()
 
     def add_row_to_table(self, student):
         """Adds a new row to the table and fills this row with the student's data
@@ -328,6 +339,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if self.write_lock:
             return
 
+        self.get_changes()
+
         path = self.get_csv_path()
 
         order = dict()
@@ -339,20 +352,110 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         with io.open(path, 'w', encoding='utf-8', newline='') as f:
             f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
-            data = []
-            for idx in range(self.table_widget.rowCount()):
-                if self.table_widget.item(idx, 1).text():
-                    data.append((
-                        self.table_widget.item(idx, 1).text(),
-                        self.table_widget.item(idx, 2).text() or '0',
-                        'an' if self.get_checkbox(idx).isChecked() else 'ab',
-                        self.table_widget.item(idx, 4).text() or '0',
-                        self.table_widget.item(idx, 5).text()
-                    ))
-
+            data = self.get_data()
             data.sort(key=lambda t: order.get(t[0], 999))
             for d in data:
                 f.write('{};{};{};{}% {}\n'.format(*d))
+
+        self.show_last_history()
+
+    def get_changes(self):
+        data = self.get_data()
+        if len(data) == len(self.current_data):
+            for new, current in zip(data, self.current_data):
+                if new != current:
+                    student = self.get_student(new[0]).name
+                    if new[2] == 'an' != current[2]:
+                        text = '{} ist anwesend'.format(student)
+                        self.add_new_history((new[0], text, 2, 'ab', 'an'))
+                    if new[2] == 'ab' !=  current[2]:
+                        text = '{} ist nicht anwesend'.format(student)
+                        self.add_new_history((new[0], text, 2, 'an', 'ab'))
+                    if new[3] != current[3]:
+                        text = '{} erreicht {} bei der Adhoc-Aufgabe'.format(student, new[3])
+                        self.add_new_history((new[0], text, 3, current[3], new[3]))
+                    if new[4] != current[4]:
+                        text = '{}: {}'.format(student, new[4])
+                        self.add_new_history((new[0], text, 4, current[4], new[4]))
+
+        self.current_data = data
+
+    def add_new_history(self, history):
+        self.history.append(history)
+        self.history_foreward = []
+        self.write_console(history[1])
+        self.show_last_history()
+
+    def undo_history(self, reverse=False):
+        last_history = None
+        if not reverse:
+            if len(self.history):
+                last_history = self.history.pop()
+                new_history = (last_history[0], last_history[1], last_history[2], last_history[4], last_history[3])
+                self.history_foreward.append(new_history)
+        else:
+            if len(self.history_foreward):
+                last_history = self.history_foreward.pop()
+                new_history = (last_history[0], last_history[1], last_history[2], last_history[4], last_history[3])
+                self.history.append(new_history)
+
+        if last_history is None:
+            return
+
+        self.table_widget.setSortingEnabled(False)
+        self.write_lock = True
+
+        index = -1
+        for i in range(self.table_widget.rowCount()):
+            if self.table_widget.item(i, 1).text() == last_history[0]:
+                index = i
+                break
+        if index >= 0:
+            if last_history[2] == 1:
+                if not last_history[3]:
+                    self.table_widget.removeRow(index)
+                else:
+                    self.add_row_to_table(last_history[3])
+            if last_history[2] == 2:
+                self.get_checkbox(index).setCheckState(QtCore.Qt.Checked if last_history[3] == 'an' else
+                                                       QtCore.Qt.Unchecked)
+            if last_history[2] in [3, 4]:
+                self.table_widget.item(index, last_history[2] + 1).setText(last_history[3])
+
+        self.write_lock = False
+        self.table_widget.setSortingEnabled(True)
+
+        self.show_last_history()
+
+    def show_last_history(self):
+        if self.history:
+            message = self.history[-1][1]
+            self.action_undo.setEnabled(True)
+            self.action_undo.setText('Zurück ({})'.format(message))
+        else:
+            self.action_undo.setText('Zurück')
+            self.action_undo.setEnabled(False)
+
+        if self.history_foreward:
+            message = self.history_foreward[-1][1]
+            self.action_redo.setEnabled(True)
+            self.action_redo.setText('Vor ({})'.format(message))
+        else:
+            self.action_redo.setText('Vor')
+            self.action_redo.setEnabled(False)
+
+    def get_data(self):
+        data = []
+        for idx in range(self.table_widget.rowCount()):
+            if self.table_widget.item(idx, 1).text():
+                data.append((
+                    self.table_widget.item(idx, 1).text(),
+                    self.table_widget.item(idx, 2).text() or '0',
+                    'an' if self.get_checkbox(idx).isChecked() else 'ab',
+                    self.table_widget.item(idx, 4).text() or '0',
+                    self.table_widget.item(idx, 5).text()
+                ))
+        return sorted(data)
 
     def find_index(self, name):
         """Find the index of a student in the table
@@ -376,27 +479,25 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 full_name = self.table_widget.item(index, 0).text()
                 if command == 'a':
                     self.get_checkbox(index).setCheckState(QtCore.Qt.Checked)
-                    template = '{} ist anwesend'
                 elif command == 'b':
                     self.get_checkbox(index).setCheckState(QtCore.Qt.Unchecked)
-                    template = '{} ist nicht anwesend'
                 elif command.isdigit():
                     self.table_widget.item(index, 4).setText(command)
-                    template = '{} erreicht {}%'
                 else:
                     self.table_widget.item(index, 5).setText(command)
-                    template = '{}: {}'
-                self.console_output.setText(template.format(full_name, command))
             else:
                 if len(index) == 0:
                     error = 'Der Student "{}" wurde nicht gefunden.'
                 else:
                     error = 'Mehrere Studenten treffen auf "{}" zu.'
-                self.console_output.setText('Error: ' + error.format(name))
+                self.write_console('Error: ' + error.format(name))
         except IndexError:
             pass
 
         self.console.clear()
+
+    def write_console(self, text):
+        self.console_output.setText(text)
 
 
 class SettingsDialog(QDialog, Ui_SettingsDialog):
