@@ -23,6 +23,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.group_infos = dict()
         self.groups = dict()
+        self.write_lock = False
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
@@ -30,21 +31,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.get_group_infos()
             self.read_group_files()
 
-        # self.find_files()
-        # self.current_group_idx = 0
-        # self.write_lock = False
-        # if self.name_files:
-        #     self.open_file(0)
-        # else:
-        #     QMessageBox().about(self, 'Keine Teilnehmerlisten gefunden',
-        #                         '\n'.join(['Um das Programm verwenden zu können, müssen Sie zuerst die Teilnehmerlisten',
-        #                                    'von Tuwel downloaden und in dieses Verzeichnis kopieren. Die findet man unter',
-        #                                    '"Programmkonstruktion - Anmeldungen - Übungsanmeldung (Normale Gruppen) - Teilnehmer/innen". ',
-        #                                    'Dort bei den jeweiligen Gruppen die .txt (z.B. 185.A79...Überblick.txt) nehmen.']))
-        #
-        # self.group_combobox.currentIndexChanged.connect(self.open_file)
+        self.table_widget.cellChanged.connect(self.export_csv)
         # self.action_export.triggered.connect(lambda: self.write_file(savefile=False))
-        # self.table_widget.cellChanged.connect(lambda: self.write_file(savefile=True))
         # self.console.returnPressed.connect(self.execute_console)
         # self.action_new.triggered.connect(lambda: self.open_file(self.group_combobox.currentIndex(), new=True))
         # self.action_add_student.triggered.connect(self.add_row)
@@ -165,6 +153,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         except KeyError:
             pass
 
+        self.write_lock = True
         self.table_widget.clear()
         self.table_widget.setRowCount(0)
 
@@ -180,17 +169,12 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         for student in self.groups[group_name].students:
             self.add_row_to_table(student)
 
-        path_template = self.settings.value('Path/pk_repo', '') + \
-                '/Anwesenheiten/Uebungen/{nr}/{group_name}_ue{nr_plus_1}.csv'
-        lesson_nr = int(self.lesson_combobox.currentText())
-        path = path_template.format(nr=lesson_nr, group_name=group_name, nr_plus_1=lesson_nr+1)
-        self.load_csv_file(path)
-
-        # self.update_checkbox_data()
+        self.load_csv_file(self.get_csv_path())
 
         self.table_widget.resizeColumnsToContents()
         self.table_widget.setSortingEnabled(True)
         self.table_widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
+        self.write_lock = False
 
     def add_row_to_table(self, student):
         """Adds a new row to the table and fills this row with the student's data
@@ -219,7 +203,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         chk_bx = QCheckBox()
         chk_bx.setCheckState(QtCore.Qt.Unchecked)
         chk_bx.stateChanged.connect(self.attendance_changed)
-        chk_bx.clicked.connect(self.update_checkbox_data)
         lay_out = QHBoxLayout(check_widget)
         lay_out.addWidget(chk_bx)
         lay_out.setAlignment(QtCore.Qt.AlignCenter)
@@ -234,16 +217,24 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.table_widget.setItem(idx, 5, QTableWidgetItem())
 
+    def get_csv_path(self, lesson_nr=None):
+        """Returns the path to the csv-file
+        """
+        path_template = self.settings.value('Path/pk_repo', '') + \
+                        '/Anwesenheiten/Uebungen/{nr}/{group_name}_ue{nr_plus_1}.csv'
+        group_name = self.group_combobox.currentText()
+        if lesson_nr is None:
+            lesson_nr = int(self.lesson_combobox.currentText())
+        return path_template.format(nr=lesson_nr, group_name=group_name, nr_plus_1=lesson_nr+1)
+
     def populate_lesson_numbers(self):
         """Finds the csv files for this group and populates the combobox
         """
         group_name = self.group_combobox.currentText()
-        path_template = self.settings.value('Path/pk_repo', '') + \
-                        '/Anwesenheiten/Uebungen/{nr}/{group_name}_ue{nr_plus_1}.csv'
+
         lessons = []
         for lesson_nr in range(99):
-            path = path_template.format(nr=lesson_nr, group_name=group_name, nr_plus_1=lesson_nr+1)
-            if os.path.isfile(path):
+            if os.path.isfile(self.get_csv_path(lesson_nr)):
                 lessons.append(str(lesson_nr))
             else:
                 break
@@ -295,38 +286,31 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def attendance_changed(self):
         """Update the attendance-statistic
         """
+        self.export_csv()
         count = sum(self.get_checkbox(index).isChecked() for index in range(self.table_widget.rowCount()))
         attendance = 'Anwesend {}/{}'.format(count, self.table_widget.rowCount())
         self.table_widget.setHorizontalHeaderItem(3, QTableWidgetItem(attendance))
 
-    def update_checkbox_data(self):
-        for idx in range(self.table_widget.rowCount()):
-            self.table_widget.item(idx, 3).setData(0, int(self.get_checkbox(idx).isChecked()))
+    def export_csv(self):
+        """Write the opened table to a csv-file
+        """
+        if self.write_lock:
+            return
 
-    def get_savefiles(self):
-        current_group = self.group_combobox.currentText()
-        if os.path.exists('Saves'):
-            self.history_files = sorted(set(f for f in os.listdir('Saves') if f.startswith(current_group)))
+        path = self.get_csv_path()
+        with open(path, 'r', encoding='utf-8') as f:
+            next(f)
+            order = dict()
+            for idx, line in enumerate(f):
+                matrikelnr = line.split(';')[0]
+                order[matrikelnr] = idx
 
-    def write_file(self, savefile=True):
-
-        group_name = self.group_combobox.itemText(self.current_group_idx)
-        if savefile:
-            now = datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-            file_name = 'Saves/{}_{}.csv'.format(group_name, now)
-        else:
-            file_name = QFileDialog.getSaveFileName(self, 'Export', group_name + '_ueX.csv', 'CSV (*.csv)')[0]
-            if not file_name:
-                return
-
-        if not os.path.exists('Saves'):
-            os.makedirs('Saves')
-
-        with io.open(file_name, 'w', encoding='utf-8', newline='') as f:
+        with io.open(path, 'w', encoding='utf-8', newline='') as f:
             f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
+            data = []
             for idx in range(self.table_widget.rowCount()):
                 if self.table_widget.item(idx, 1).text():
-                    f.write('{};{};{};{}% {}\n'.format(
+                    data.append((
                         self.table_widget.item(idx, 1).text(),
                         self.table_widget.item(idx, 2).text() or '0',
                         'an' if self.get_checkbox(idx).isChecked() else 'ab',
@@ -334,8 +318,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                         self.table_widget.item(idx, 5).text()
                     ))
 
-        self.history_files.append(file_name[6:])
-        self.history_index = len(self.history_files) - 1
+            data.sort(key=lambda t: order.get(t[0], 999))
+            for d in data:
+                f.write('{};{};{};{}% {}\n'.format(*d))
 
     def find_index(self, name):
         indices = [i for i in range(self.table_widget.rowCount())
