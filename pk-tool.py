@@ -24,12 +24,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.groups = dict()
         self.write_lock = False
 
-        self.settings = QSettings('settings.ini', QSettings.IniFormat)
-        pk_repo_path = self.settings.value('Path/pk_repo', '')
-        if pk_repo_path:
-            self.get_group_infos()
-            self.read_group_files()
-
         self.table_widget.cellChanged.connect(self.export_csv)
         self.console.returnPressed.connect(self.execute_console)
         self.action_new.triggered.connect(self.new_csv)
@@ -40,13 +34,26 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_combobox.currentIndexChanged.connect(self.populate_lesson_numbers)
         self.lesson_combobox.currentIndexChanged.connect(self.load_group_data)
 
+        self.settings = QSettings('settings.ini', QSettings.IniFormat)
+        pk_repo_path = self.settings.value('Path/pk_repo', '')
+        try:
+            if pk_repo_path:
+                self.get_group_infos()
+                self.read_group_files()
+        except:
+            pass
+
     def open_settings(self):
         """Opens the settings-dialog, which allows to define the path to the pk-repo and the username
         Updates everything after closing.
         """
         settings_dialog = SettingsDialog(self.settings, self.group_infos)
         settings_dialog.exec_()
-        self.fill_group_names_combobox()
+        try:
+            self.get_group_infos()
+            self.read_group_files()
+        except:
+            pass
 
     def read_group_files(self):
         """Reads the files 'groups_fortgeschritten.txt' und 'groups_normal.txt',
