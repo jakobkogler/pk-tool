@@ -1,0 +1,11 @@
+Save/
+.idea/
+__pycache__/
+dist/
+build/
+**.txt
+**.csv
+**.exe
+**.spec
+**.pro
+**.pro.user
