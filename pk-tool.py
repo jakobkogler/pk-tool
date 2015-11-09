@@ -9,7 +9,7 @@ import io
 from collections import namedtuple
 from _datetime import datetime
 
-
+GroupInfos = namedtuple('GroupInfos', 'instructor, tutor1, tutor2')
 Group = namedtuple('Group', 'day name type students')
 Student = namedtuple('Student', 'name matrikelnr email')
 
@@ -52,6 +52,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.button_select_repo_path.clicked.connect(self.select_repo_path)
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
         self.group_day_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
+        self.group_combobox.currentIndexChanged.connect(self.load_group_data)
 
     def read_group_files(self):
         path_template = self.line_edit_repo_path.text() + '/Anwesenheiten/Anmeldung/groups_{group_type}.txt'
@@ -80,9 +81,43 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             if students:
                 self.groups.append(Group(group_name[:2], group_name[2:], group_type, students))
 
+        self.get_group_infos()
+
         self.group_type_combobox.addItems('Alle Normal Fortgeschritten'.split())
         self.group_day_combobox.addItems('mo di mi do fr'.split())
         self.fill_group_names_combobox()
+        self.load_group_data()
+
+    def get_group_infos(self):
+        path = self.line_edit_repo_path.text() + '/GRUPPEN.txt'
+
+        group_name_regex = re.compile('(mo|di|mi|do|fr)\d{2}\w')
+
+        self.group_infos = dict()
+
+        with open(path, 'r', encoding='utf-8') as f:
+            group_name = ''
+            instructor = ''
+            tutor1 = ''
+            tutor2 = ''
+
+            for line in f:
+                match = group_name_regex.search(line)
+                if match:
+                    if group_name:
+                        self.group_infos[group_name] = GroupInfos(instructor, tutor1, tutor2)
+                    group_name = match.group(0)
+                else:
+                    extract_name = lambda: line.split('=')[-1].strip()
+                    if line.startswith('leiter'):
+                        instructor = extract_name()
+                    if line.startswith('tutor1'):
+                        tutor1 = extract_name()
+                    if line.startswith('tutor2'):
+                        tutor2 = extract_name()
+
+            if group_name:
+                self.group_infos[group_name] = GroupInfos(instructor, tutor1, tutor2)
 
     def fill_group_names_combobox(self):
         type_index = self.group_type_combobox.currentIndex()
@@ -98,7 +133,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_combobox.addItems(group_names)
 
     def load_group_data(self):
-        pass
+        group_name = self.group_day_combobox.currentText() + self.group_combobox.currentText()
+        try:
+            infos = self.group_infos[group_name]
+            self.label_instructor_name.setText(infos.instructor)
+            self.label_tutor1_name.setText(infos.tutor1)
+            self.label_tutor2_name.setText(infos.tutor2)
+        except KeyError:
+            return
 
     def select_repo_path(self):
         pk_repo_path = QFileDialog.getExistingDirectory(self, 'Pfad zum PK-Repository', self.line_edit_repo_path.text(), QFileDialog.ShowDirsOnly)
@@ -233,7 +275,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.history_index += 1
             self.history_load()
 
-    def history_load(self):
+    def history_leiteroad(self):
         self.write_lock = True
         self.table_widget.setSortingEnabled(False)
         with open('Saves/' + self.history_files[self.history_index], 'r') as f:

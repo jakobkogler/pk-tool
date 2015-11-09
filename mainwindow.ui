@@ -14,89 +14,140 @@
    <string>PK Übungstool</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,100,2">
-    <property name="spacing">
-     <number>1</number>
-    </property>
-    <property name="rightMargin">
-     <number>9</number>
-    </property>
-    <property name="bottomMargin">
-     <number>9</number>
-    </property>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label_repo_path">
-        <property name="text">
-         <string>Pfad zum PK-Repo:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="line_edit_repo_path"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="button_select_repo_path">
-        <property name="text">
-         <string>Auswählen</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="0">
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Gruppenauswahl:</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label_repo_path">
+           <property name="text">
+            <string>Pfad zum PK-Repo:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="line_edit_repo_path"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="button_select_repo_path">
+           <property name="text">
+            <string>Auswählen</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="label_group_type">
+           <property name="text">
+            <string>Gruppentype:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="group_type_combobox"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_day">
+           <property name="text">
+            <string>Übungstag:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="group_day_combobox"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_group">
+           <property name="text">
+            <string>Gruppe:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="group_combobox">
+           <property name="focusPolicy">
+            <enum>Qt::WheelFocus</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_group_type">
-        <property name="text">
-         <string>Gruppentype:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="group_type_combobox"/>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_day">
-        <property name="text">
-         <string>Übungstag:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="group_day_combobox"/>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_group">
-        <property name="text">
-         <string>Gruppe:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="group_combobox">
-        <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
+    <item row="0" column="1">
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Gruppen-Info:</string>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_tutor1_name">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_instructor">
+         <property name="text">
+          <string>Übungsleiter:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_instructor_name">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_tutor1">
+         <property name="text">
+          <string>Tutor 1:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="label_tutor2_name">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_tutor2">
+         <property name="text">
+          <string>Tutor 2:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
-    <item>
+    <item row="1" column="0" colspan="2">
      <widget class="QTableWidget" name="table_widget">
       <property name="focusPolicy">
        <enum>Qt::WheelFocus</enum>
@@ -109,7 +160,7 @@
       </attribute>
      </widget>
     </item>
-    <item>
+    <item row="2" column="0" colspan="2">
      <layout class="QGridLayout" name="gridLayout">
       <item row="1" column="1">
        <widget class="QLineEdit" name="console"/>
