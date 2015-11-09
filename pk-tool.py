@@ -22,6 +22,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.group_infos = dict()
         self.groups = dict()
+        self.csv_files = dict()
         self.write_lock = False
 
         self.table_widget.cellChanged.connect(self.export_csv)
@@ -31,8 +32,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.action_settings.triggered.connect(self.open_settings)
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
-        self.group_combobox.currentIndexChanged.connect(self.populate_lesson_numbers)
-        self.lesson_combobox.currentIndexChanged.connect(self.load_group_data)
+        self.group_combobox.currentIndexChanged.connect(self.populate_files)
+        self.file_combobox.currentIndexChanged.connect(self.load_group_data)
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
@@ -87,7 +88,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
         self.fill_group_names_combobox()
-        self.populate_lesson_numbers()
+        self.populate_files()
         self.load_group_data()
 
     def get_group_infos(self):
@@ -173,7 +174,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.clear()
         self.table_widget.setRowCount(0)
 
-        if not self.lesson_combobox.currentText():
+        if not self.file_combobox.currentText() or not group_name:
             self.table_widget.setColumnCount(0)
             return
 
@@ -233,42 +234,40 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.table_widget.setItem(idx, 5, QTableWidgetItem())
 
-    def get_csv_path(self, lesson_nr=None):
+    def get_csv_path(self):
         """Returns the path to the csv-file
         """
-        path_template = self.settings.value('Path/pk_repo', '') + \
-                        '/Anwesenheiten/Uebungen/{nr}/{group_name}_ue{nr_plus_1}.csv'
-        group_name = self.group_combobox.currentText()
-        if lesson_nr is None:
-            lesson_nr = int(self.lesson_combobox.currentText())
-        return path_template.format(nr=lesson_nr, group_name=group_name, nr_plus_1=lesson_nr+1)
+        return self.csv_files[self.file_combobox.currentText()]
 
     def new_csv(self):
-        new_index = self.lesson_combobox.count()
-        directory = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Uebungen/' + str(new_index)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        directory = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Uebungen/'
+        path = QFileDialog.getSaveFileName(self, 'Neue CSV-Datei', directory, '*.csv')[0]
+        if not path:
+            return
 
-        path = self.get_csv_path(new_index)
         with io.open(path, 'w', encoding='utf-8', newline='') as f:
             f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
-        self.lesson_combobox.addItem(str(new_index))
-        self.lesson_combobox.setCurrentIndex(new_index)
 
-    def populate_lesson_numbers(self):
+        self.populate_files()
+        index = self.file_combobox.count() - 1
+        for i in range(self.file_combobox.count()):
+            if path.endswith(self.file_combobox.itemText(i)):
+                index = i
+        self.file_combobox.setCurrentIndex(index)
+
+    def populate_files(self):
         """Finds the csv files for this group and populates the combobox
         """
         group_name = self.group_combobox.currentText()
+        path = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Uebungen/'
+        self.csv_files = {os.path.join(os.path.basename(root), name): os.path.join(root, name)
+                 for root, dirs, files in os.walk(path)
+                 for name in files
+                 if name.startswith(group_name)}
 
-        lessons = []
-        for lesson_nr in range(99):
-            if os.path.isfile(self.get_csv_path(lesson_nr)):
-                lessons.append(str(lesson_nr))
-            else:
-                break
+        self.file_combobox.clear()
+        self.file_combobox.addItems(sorted(self.csv_files.keys()))
 
-        self.lesson_combobox.clear()
-        self.lesson_combobox.addItems(lessons)
 
     def load_csv_file(self, path):
         """Load a lesson-csv-file and update the table with it's data

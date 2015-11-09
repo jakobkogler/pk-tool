@@ -28,7 +28,7 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <property name="spacing">
-        <number>0</number>
+        <number>6</number>
        </property>
        <property name="leftMargin">
         <number>6</number>
@@ -73,14 +73,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_lesson">
+        <widget class="QLabel" name="label_file">
          <property name="text">
-          <string>Übung:</string>
+          <string>Datei:</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="lesson_combobox"/>
+        <widget class="QComboBox" name="file_combobox"/>
        </item>
       </layout>
      </widget>
