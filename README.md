@@ -54,7 +54,13 @@ Jede Spalte kann per Klick auf die Spaltenüberschrift sortiert werden.
 
 ### Neue Studenten der Tabelle hinzufügen
 
-Falls ein Student nicht in der Tabelle erscheint (z.B. weil er aus einer anderen Gruppe ist), kann man per Button-Click eine neue Zeile der Tabelle hinzufügen. 
+Falls ein Student nicht in der Tabelle erscheint (z.B. weil er aus einer anderen Gruppe ist), kann man via `Bearbeiten - Student hinzufügen` eine neue Zeile der Tabelle hinzufügen.
+ 
+### History
+
+Man kann die letzten Änderungen rückgängig machen, bzw. die rückgängig gemachten Schritte wiederherstellen. 
+Allerdings geht die History verloren, sobald man auf eine andere CSV-Datei wechselt oder man das Programm schließt.  
+Zu finden sind die Befehle unter `Bearbeiten - Zurück` bzw. `Bearbeiten - Vor`. 
 
 ## Licence ##
 

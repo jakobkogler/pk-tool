@@ -393,11 +393,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 last_history = self.history.pop()
                 new_history = (last_history[0], last_history[1], last_history[2], last_history[4], last_history[3])
                 self.history_foreward.append(new_history)
+                self.write_console('Rückgängig: {}'.format(last_history[1]))
         else:
             if len(self.history_foreward):
                 last_history = self.history_foreward.pop()
                 new_history = (last_history[0], last_history[1], last_history[2], last_history[4], last_history[3])
                 self.history.append(new_history)
+                self.write_console('Wiederherstellen: {}'.format(last_history[1]))
 
         if last_history is None:
             return
@@ -424,6 +426,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.write_lock = False
         self.table_widget.setSortingEnabled(True)
+        self.current_data = self.get_data()
 
         self.show_last_history()
 
