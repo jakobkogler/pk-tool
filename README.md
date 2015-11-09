@@ -6,7 +6,7 @@ Eine nette Gui, die PK-Tutoren während der Übungen unterstützen soll.
 
 ## Download
 
-Kompilierte Version für Windows 10 (und niedriger?): [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.1/pk-tool.exe)
+Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.1/pk-tool.exe)
 
 ## Voraussetzungen ##
 
@@ -15,13 +15,12 @@ Kompilierte Version für Windows 10 (und niedriger?): [pk-tool.exe](https://gith
 
 ## Benutzung ##
 
-Zuerst benötigt man die Teilnehmerlisten von Tuwel. 
-Zu finden sind die unter Programmkonstruktion - Anmeldungen - Übungsanmeldung (Normale Gruppen) - Teilnehmer/innen. 
-Dort bei den jeweiligen Gruppen die `.txt` (z.B. `185.A79 Programmkon...so12a_Überblick.txt`) runterladen und direkt neben die `pk-tool.py` ablegen. 
+Das Programm startet man mit `python3 pk-tool.py`. 
+Nach dem ersten Start des Programmes muss man ein paar Einstellungen vornehmen.
+Den Einstellungs-Dialog findet man unter `Datei - Einstellungen`. 
+Dort muss man den Pfad zum PK-Repository angeben, und kann außerdem seinen Usernamen festlegen, um eine bessere Übersicht über seine Gruppen zu bekommen. 
 
-Danach kann man das Program kann man einfach mit `python3 pk-tool.py` starten. 
-
-In einer Combobox kann man die gewünschte Gruppe auswählen. 
+Mit Hilfe von Comboboxen kann man die gewünschte Gruppe auswählen und die gewünschte Übung auswählen. 
 Dadurch wird eine interactive Tabelle erstellt. 
 Man kann die Anwesenheit eintragen (Häckchen setzen), die Adhoc-Aufgabe bewerten (Zahl zwischen 0 und 100), und auch einen Kommentar eintragen. 
 
@@ -40,31 +39,28 @@ Das funktioniert aber natürlich nur, wenn der Substring nur in einem Namen vork
 
 ### CSV-Datei exportieren
 
-Die fertige Tabelle kann man anschließend via Button-Click als CSV-Datei exportieren. 
-Dabei wird automatisch mit `utf-8` kodiert und Unix Line Endings verwendet (auch unter Windows, ist aber nicht getestet). 
-
-### History - Saves
-
-Jede Änderung an der Tabelle wird automatisch zwischengespeichert. 
-Es gehen keine Tabelleneintragungen verloren, wenn man das Programm beendet und neu startet. 
-Und falls die GUI katastrophal crashed und sich nicht mehr öffnen lässt, 
-kann man sich im `Saves`-Ordner den letzten Stand (`gruppe_datum_uhrzeit.csv`) raussuchen und dort mit einem Editor weiterarbeiten. 
-
-Man kann außerdem die letzten Tabellenänderungen rückgängig machen, bzw. die rückgängig gemachten wiederherstellen. 
-Diese History-Funktion ist aber nicht besonders intelligent. 
+Jede Änderung wird automatisch gespeichert im PK-Repo-Ordner gespeichert. 
+Dabei wird automatisch mit `utf-8` kodiert und Unix Line Endings verwendet (auch unter Windows). 
+Nach dem Bearbeiten der Files muss man aber manuell die Dateien ins Git-Repo einchecken und pushen. 
 
 ### Neue Tabelle anfangen
 
-Per Button-Click werden alle Tabelleneinträge gelöscht. Kann man per History-Funktion auch rückgängig machen. 
+Per Klick auf `Datei - Neu` wird eine neue CSV-Datei für die aktuell ausgewählte Gruppe erstellt. 
+Diese wird automatisch im richtigen Ordner gespeichert. 
 
-## Sortieren
+### Sortieren
 
-Jede Spalte kann per Click auf die Spaltenüberschrift sortiert werden.  
+Jede Spalte kann per Klick auf die Spaltenüberschrift sortiert werden.  
 
 ### Neue Studenten der Tabelle hinzufügen
 
-Falls ein Student nicht in der Tabelle erscheint (z.B. weil er aus einer anderen Gruppe ist), kann man per Button-Click eine neue Zeile der Tabelle hinzufügen. 
-Fängt man eine neue Tabelle an, wird diese aber wieder entfernt. Welchselt ein Student die Gruppe permanent, wäre es besser wenn man sich eine neue Teilnehmerliste von Tuwel holt. 
+Falls ein Student nicht in der Tabelle erscheint (z.B. weil er aus einer anderen Gruppe ist), kann man via `Bearbeiten - Student hinzufügen` eine neue Zeile der Tabelle hinzufügen.
+ 
+### History
+
+Man kann die letzten Änderungen rückgängig machen, bzw. die rückgängig gemachten Schritte wiederherstellen. 
+Allerdings geht die History verloren, sobald man auf eine andere CSV-Datei wechselt oder man das Programm schließt.  
+Zu finden sind die Befehle unter `Bearbeiten - Zurück` bzw. `Bearbeiten - Vor`. 
 
 ## Licence ##
 

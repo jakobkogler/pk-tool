@@ -9,3 +9,4 @@ build/
 **.spec
 **.pro
 **.pro.user
+**.ini
