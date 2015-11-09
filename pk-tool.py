@@ -92,8 +92,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             if students:
                 self.groups[group_name] = Group(group_name, group_type, students)
 
-        self.group_type_combobox.addItems('Alle Normal Fortgeschritten Meine'.split())
+        self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
         self.fill_group_names_combobox()
+        self.populate_lesson_numbers()
         self.load_group_data()
 
     def get_group_infos(self):
@@ -136,10 +137,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         type_index = self.group_type_combobox.currentIndex()
         allowed_types = []
 
-        if type_index < 3:
-            if type_index != 1:
-                allowed_types.append('fortgeschritten')
+        if type_index > 0:
             if type_index != 2:
+                allowed_types.append('fortgeschritten')
+            if type_index != 3:
                 allowed_types.append('normal')
             group_names = [group.name for group in self.groups.values() if group.type in allowed_types]
         else:
@@ -148,6 +149,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                            self.group_infos[group.name].tutor2 == username]
 
         self.group_combobox.clear()
+        group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]),name[2:]))
         self.group_combobox.addItems(group_names)
 
     def load_group_data(self):
@@ -161,35 +163,34 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.label_tutor1_name.setText(infos.tutor1)
             self.label_tutor2_name.setText(infos.tutor2)
         except KeyError:
-            return
-
-        if not self.lesson_combobox.currentText():
-            return
+            pass
 
         self.table_widget.clear()
+        self.table_widget.setRowCount(0)
+
+        if not self.lesson_combobox.currentText():
+            self.table_widget.setColumnCount(0)
+            return
+
         labels = 'Name;Matrikelnr.;Gruppe;Anwesend 00/00;Adhoc;Kommentar'.split(';')
         self.table_widget.setColumnCount(len(labels))
-        self.table_widget.setRowCount(0)
         self.table_widget.setSortingEnabled(False)
         self.table_widget.setHorizontalHeaderLabels(labels)
 
         for student in self.groups[group_name].students:
             self.add_row_to_table(student)
 
-
-
         path_template = self.settings.value('Path/pk_repo', '') + \
                 '/Anwesenheiten/Uebungen/{nr}/{group_name}_ue{nr_plus_1}.csv'
         lesson_nr = int(self.lesson_combobox.currentText())
         path = path_template.format(nr=lesson_nr, group_name=group_name, nr_plus_1=lesson_nr+1)
+        self.load_csv_file(path)
 
-
-        # self.get_savefiles()
-        #
         # self.update_checkbox_data()
-        # self.table_widget.resizeColumnsToContents()
-        # self.table_widget.setSortingEnabled(True)
-        # self.table_widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
+
+        self.table_widget.resizeColumnsToContents()
+        self.table_widget.setSortingEnabled(True)
+        self.table_widget.sortByColumn(0, QtCore.Qt.AscendingOrder)
 
     def add_row_to_table(self, student):
         """Adds a new row to the table and fills this row with the student's data
@@ -250,9 +251,50 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.lesson_combobox.clear()
         self.lesson_combobox.addItems(lessons)
 
+    def load_csv_file(self, path):
+        """Load a lesson-csv-file and update the table with it's data
+        """
+        with open(path, 'r', encoding='utf-8') as f:
+            next(f)
+            for line in f:
+                matrikelnr, group_name, attendance, comment = line.strip().split(';')
+                adhoc, *comment = comment.split()
+                adhoc = adhoc.strip('%')
+                if adhoc == '0':
+                    adhoc = ''
+                comment = ' '.join(comment)
+
+                indices = [idx for idx in range(self.table_widget.rowCount())
+                               if self.table_widget.item(idx, 1).text() == matrikelnr]
+                if len(indices) == 1:
+                    idx = indices[0]
+                else:
+                    idx = self.table_widget.rowCount()
+                    new_student = None
+                    for group in self.groups.values():
+                        for student in group.students:
+                            if student.matrikelnr == matrikelnr:
+                                new_student = student
+                    if new_student:
+                        self.add_row_to_table(new_student)
+                    else:
+                        self.add_row_to_table(Student('', matrikelnr, '', group_name))
+
+                self.table_widget.item(idx, 1).setText(matrikelnr)
+                self.table_widget.item(idx, 2).setText(group_name)
+                self.get_checkbox(idx).setCheckState(QtCore.Qt.Checked if attendance == 'an' else
+                                                     QtCore.Qt.Unchecked)
+                self.table_widget.item(idx, 4).setText(adhoc)
+                self.table_widget.item(idx, 5).setText(comment)
+
+    def get_checkbox(self, index):
+        """Returns the checkbox for a specific index
+        """
+        return self.table_widget.cellWidget(index, 3).layout().itemAt(0).widget()
 
     def attendance_changed(self):
-        self.write_file(savefile=True)
+        """Update the attendance-statistic
+        """
         count = sum(self.get_checkbox(index).isChecked() for index in range(self.table_widget.rowCount()))
         attendance = 'Anwesend {}/{}'.format(count, self.table_widget.rowCount())
         self.table_widget.setHorizontalHeaderItem(3, QTableWidgetItem(attendance))
@@ -266,39 +308,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if os.path.exists('Saves'):
             self.history_files = sorted(set(f for f in os.listdir('Saves') if f.startswith(current_group)))
 
-    def history_leiteroad(self):
-        self.write_lock = True
-        self.table_widget.setSortingEnabled(False)
-        with open('Saves/' + self.history_files[self.history_index], 'r') as f:
-            next(f)
-            for line in f:
-                matrikelnr, group, attendance, comment = line.strip().split(';')
-                adhoc, *comment = comment.split()
-                adhoc = adhoc.strip('%')
-                if adhoc == '0':
-                    adhoc = ''
-                comment = ' '.join(comment)
-
-                indices = [idx for idx in range(self.table_widget.rowCount())
-                               if self.table_widget.item(idx, 1).text() == matrikelnr]
-                if len(indices) == 1:
-                    idx = indices[0]
-                else:
-                    idx = self.table_widget.rowCount()
-                    self.add_row()
-
-                self.table_widget.item(idx, 1).setText(matrikelnr)
-                self.table_widget.item(idx, 2).setText(group)
-                self.get_checkbox(idx).setCheckState(QtCore.Qt.Checked if attendance == 'an' else
-                                                     QtCore.Qt.Unchecked)
-                self.table_widget.item(idx, 4).setText(adhoc)
-                self.table_widget.item(idx, 5).setText(comment)
-        self.table_widget.setSortingEnabled(True)
-        self.write_lock = False
-
     def write_file(self, savefile=True):
-        if self.write_lock:
-            return
 
         group_name = self.group_combobox.itemText(self.current_group_idx)
         if savefile:
@@ -326,9 +336,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.history_files.append(file_name[6:])
         self.history_index = len(self.history_files) - 1
-
-    def get_checkbox(self, index):
-        return self.table_wdget.cellWidget(index, 3).layout().itemAt(0).widget()
 
     def find_index(self, name):
         indices = [i for i in range(self.table_widget.rowCount())
