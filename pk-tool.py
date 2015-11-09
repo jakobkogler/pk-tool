@@ -21,11 +21,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
-        # self.name_files = []
         self.group_infos = dict()
         self.groups = []
-        # self.history_files = []
-        # self.history_index = None
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
@@ -50,8 +47,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         # self.table_widget.cellChanged.connect(lambda: self.write_file(savefile=True))
         # self.console.returnPressed.connect(self.execute_console)
         # self.action_new.triggered.connect(lambda: self.open_file(self.group_combobox.currentIndex(), new=True))
-        # self.action_undo.triggered.connect(self.history_undo)
-        # self.action_redo.triggered.connect(self.history_redo)
         # self.action_add_student.triggered.connect(self.add_row)
 
         self.action_settings.triggered.connect(self.open_settings)
@@ -59,11 +54,18 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_combobox.currentIndexChanged.connect(self.load_group_data)
 
     def open_settings(self):
+        """Opens the settings-dialog, which allows to define the path to the pk-repo and the username
+        Updates everything after closing.
+        """
         settings_dialog = SettingsDialog(self.settings, self.group_infos)
         settings_dialog.exec_()
         self.fill_group_names_combobox()
 
     def read_group_files(self):
+        """Reads the files 'groups_fortgeschritten.txt' und 'groups_normal.txt',
+        and extracts all groups and student data.
+        Afterwards it fills all combo-boxes and load the first file
+        """
         path_template = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Anmeldung/groups_{group_type}.txt'
 
         for group_type in 'fortgeschritten', 'normal':
@@ -94,6 +96,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.load_group_data()
 
     def get_group_infos(self):
+        """Reads the file 'GRUPPEN.txt' from the pk-repo,
+        and extracts all groups and the names of the instructor and the tutors.
+        Saves this data as a dict.
+        """
         path = self.settings.value('Path/pk_repo', '') + '/GRUPPEN.txt'
 
         group_name_regex = re.compile('(mo|di|mi|do|fr)\d{2}\w')
@@ -123,6 +129,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 self.group_infos[group_name] = GroupInfos(instructor, tutor1, tutor2)
 
     def fill_group_names_combobox(self):
+        """Populate the combobox with all the group names,
+        that apply for the group type specified in the form.
+        """
         type_index = self.group_type_combobox.currentIndex()
         allowed_types = []
 
@@ -141,6 +150,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_combobox.addItems(group_names)
 
     def load_group_data(self):
+        """Load all data for a specific group.
+        It updates the names of the instructor and tutors and loads the last available csv-file for this group.
+        """
         group_name = self.group_combobox.currentText()
         try:
             infos = self.group_infos[group_name]
@@ -149,13 +161,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.label_tutor2_name.setText(infos.tutor2)
         except KeyError:
             return
-
-    def find_files(self):
-        r = re.compile('185\.A79 Programmkonstruktion .*_(.*?)_Überblick.txt')
-        matches = [r.search(f) for f in os.listdir('.')]
-        self.name_files = [m.group(0) for m in matches if m]
-        shortcuts = [m.group(1) for m in matches if m]
-        self.group_combobox.addItems(shortcuts)
 
     def attendance_changed(self):
         self.write_file(savefile=True)
@@ -219,11 +224,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.write_lock = False
 
     def open_file(self, index, new=False):
-        if self.history_index is not None and self.history_index != len(self.history_files) - 1:
-            self.write_file(savefile=True)
-
         self.current_group_idx = index
-        self.history_index = None
 
         with open(self.name_files[index], 'r', encoding='utf-8') as f:
             students = []
@@ -233,7 +234,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 if m:
                     students.append(Student(*(m.group(i) for i in range(1, 4))))
 
-        self.write_lock = True
         self.table_widget.clear()
         labels = 'Name;Matrikelnr.;Gruppe;Anwesend {:02}/{};Adhoc;Kommentar'.format(0, len(students)).split(';')
         self.table_widget.setColumnCount(len(labels))
@@ -245,13 +245,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.add_row(student)
 
         self.get_savefiles()
-        self.history_index = len(self.history_files)
-        if self.history_files and not new:
-            self.history_undo()
-            self.write_lock = False
-        else:
-            self.write_lock = False
-            self.write_file(savefile=True)
 
         self.update_checkbox_data()
         self.table_widget.resizeColumnsToContents()
@@ -266,16 +259,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         current_group = self.group_combobox.currentText()
         if os.path.exists('Saves'):
             self.history_files = sorted(set(f for f in os.listdir('Saves') if f.startswith(current_group)))
-
-    def history_undo(self):
-        if self.history_index:
-            self.history_index -= 1
-            self.history_load()
-
-    def history_redo(self):
-        if self.history_index < len(self.history_files) - 1:
-            self.history_index += 1
-            self.history_load()
 
     def history_leiteroad(self):
         self.write_lock = True
