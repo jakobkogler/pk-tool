@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
-    QHBoxLayout, QMessageBox
+    QHBoxLayout, QInputDialog, QLineEdit
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
 from mainwindow import Ui_MainWindow
@@ -9,7 +9,6 @@ import os
 import re
 import io
 from collections import namedtuple
-from _datetime import datetime
 
 GroupInfos = namedtuple('GroupInfos', 'instructor, tutor1, tutor2')
 Group = namedtuple('Group', 'name type students')
@@ -34,7 +33,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.cellChanged.connect(self.export_csv)
         self.console.returnPressed.connect(self.execute_console)
         self.action_new.triggered.connect(self.new_csv)
-        # self.action_add_student.triggered.connect(self.add_row)
+        self.action_add_student.triggered.connect(self.new_student)
 
         self.action_settings.triggered.connect(self.open_settings)
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
@@ -138,6 +137,17 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_combobox.clear()
         group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]),name[2:]))
         self.group_combobox.addItems(group_names)
+
+    def new_student(self):
+        self.write_lock = True
+        self.table_widget.setSortingEnabled(False)
+        matrikelnr, ok = QInputDialog.getText(self, 'Neuen Studenten hinzufügen', 'Matrikelnummer:')
+        if ok and matrikelnr:
+            student = self.get_student(matrikelnr)
+            if student:
+                self.add_row_to_table(student)
+        self.table_widget.setSortingEnabled(True)
+        self.write_lock = False
 
     def load_group_data(self):
         """Load all data for a specific group.
@@ -272,11 +282,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     idx = indices[0]
                 else:
                     idx = self.table_widget.rowCount()
-                    new_student = None
-                    for group in self.groups.values():
-                        for student in group.students:
-                            if student.matrikelnr == matrikelnr:
-                                new_student = student
+                    new_student = self.get_student(matrikelnr)
                     if new_student:
                         self.add_row_to_table(new_student)
                     else:
@@ -288,6 +294,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                                                      QtCore.Qt.Unchecked)
                 self.table_widget.item(idx, 4).setText(adhoc)
                 self.table_widget.item(idx, 5).setText(comment)
+
+    def get_student(self, matrikelnr):
+        """Finds the student object for a given matrikelnr
+        """
+        for group in self.groups.values():
+            for student in group.students:
+                if student.matrikelnr == matrikelnr:
+                    return student
 
     def get_checkbox(self, index):
         """Returns the checkbox for a specific index
