@@ -32,9 +32,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.read_group_files()
 
         self.table_widget.cellChanged.connect(self.export_csv)
-        # self.action_export.triggered.connect(lambda: self.write_file(savefile=False))
-        # self.console.returnPressed.connect(self.execute_console)
-        # self.action_new.triggered.connect(lambda: self.open_file(self.group_combobox.currentIndex(), new=True))
+        self.console.returnPressed.connect(self.execute_console)
+        self.action_new.triggered.connect(self.new_csv)
         # self.action_add_student.triggered.connect(self.add_row)
 
         self.action_settings.triggered.connect(self.open_settings)
@@ -227,6 +226,18 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             lesson_nr = int(self.lesson_combobox.currentText())
         return path_template.format(nr=lesson_nr, group_name=group_name, nr_plus_1=lesson_nr+1)
 
+    def new_csv(self):
+        new_index = self.lesson_combobox.count()
+        directory = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Uebungen/' + str(new_index)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        path = self.get_csv_path(new_index)
+        with io.open(path, 'w', encoding='utf-8', newline='') as f:
+            f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
+        self.lesson_combobox.addItem(str(new_index))
+        self.lesson_combobox.setCurrentIndex(new_index)
+
     def populate_lesson_numbers(self):
         """Finds the csv files for this group and populates the combobox
         """
@@ -298,9 +309,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             return
 
         path = self.get_csv_path()
+
+        order = dict()
         with open(path, 'r', encoding='utf-8') as f:
             next(f)
-            order = dict()
             for idx, line in enumerate(f):
                 matrikelnr = line.split(';')[0]
                 order[matrikelnr] = idx
@@ -323,11 +335,19 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 f.write('{};{};{};{}% {}\n'.format(*d))
 
     def find_index(self, name):
+        """Find the index of a student in the table
+        """
         indices = [i for i in range(self.table_widget.rowCount())
                    if name.lower() in self.table_widget.item(i, 0).text().lower()]
         return indices[0] if len(indices) == 1 else indices
 
     def execute_console(self):
+        """Executes a command from the console
+        'name a' checks the attendance
+        'name b' unchecks the attendance
+        'name number' writes the adhoc-points
+        'name other' writes a comment
+        """
         try:
             commands = self.console.text().split(' ')
             name, command = commands[0], ' '.join(commands[1:])
@@ -353,7 +373,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     error = 'Mehrere Studenten treffen auf "{}" zu.'
                 self.console_output.setText('Error: ' + error.format(name))
-
         except IndexError:
             pass
 
