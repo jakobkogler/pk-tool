@@ -237,6 +237,7 @@
     <addaction name="action_undo"/>
     <addaction name="action_redo"/>
     <addaction name="action_add_student"/>
+    <addaction name="action_get_email"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -279,6 +280,11 @@
   <action name="action_about">
    <property name="text">
     <string>About</string>
+   </property>
+  </action>
+  <action name="action_get_email">
+   <property name="text">
+    <string>Kopiere E-Mails in die Zwischenablage</string>
    </property>
   </action>
  </widget>

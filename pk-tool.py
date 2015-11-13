@@ -74,6 +74,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
         self.group_combobox.currentIndexChanged.connect(self.populate_files)
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
+        self.action_get_email.triggered.connect(self.get_email)
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
@@ -217,6 +218,12 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.write_lock = False
         self.current_data = self.get_data()
         self.show_last_history()
+
+    def get_email(self):
+        clipboard = QApplication.clipboard()
+        group_name = self.group_combobox.currentText()
+        emails = [student.email for student in self.groups[group_name].students]
+        clipboard.setText(', '.join(emails))
 
     def add_row_to_table(self, student):
         """Adds a new row to the table and fills this row with the student's data
