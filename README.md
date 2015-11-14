@@ -37,6 +37,8 @@ Die Syntax dafür ist:
 Dabei genügt es, einen Substring des echten Namens anzugeben. `odo 100` bewertet bei Studenten `Dennis T. Odom` 100%. 
 Das funktioniert aber natürlich nur, wenn der Substring nur in einem Namen vorkommt. 
 
+Anstatt dem Namen kann man auch die Matrikelnummer angeben. Z.B. `1234567 ist krank`. 
+
 ### CSV-Datei exportieren
 
 Jede Änderung wird automatisch gespeichert im PK-Repo-Ordner gespeichert. 

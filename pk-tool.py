@@ -481,11 +481,12 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 ))
         return sorted(data)
 
-    def find_index(self, name):
+    def find_index(self, identification):
         """Find the index of a student in the table
         """
         indices = [i for i in range(self.table_widget.rowCount())
-                   if name.lower() in self.table_widget.item(i, 0).text().lower()]
+                   if identification.lower() in self.table_widget.item(i, 0).text().lower() or
+                   identification == self.table_widget.item(i, 1).text()]
         return indices[0] if len(indices) == 1 else indices
 
     def execute_console(self):
@@ -497,8 +498,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         try:
             commands = self.console.text().split(' ')
-            name, command = commands[0], ' '.join(commands[1:])
-            index = self.find_index(name)
+            identification, command = commands[0], ' '.join(commands[1:])
+            index = self.find_index(identification)
             if isinstance(index, int):
                 full_name = self.table_widget.item(index, 0).text()
                 if command == 'a':
@@ -514,7 +515,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     error = 'Der Student "{}" wurde nicht gefunden.'
                 else:
                     error = 'Mehrere Studenten treffen auf "{}" zu.'
-                self.write_console('Error: ' + error.format(name))
+                self.write_console('Error: ' + error.format(identification))
         except IndexError:
             pass
 
