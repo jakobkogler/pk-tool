@@ -426,7 +426,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             return
 
         self.table_widget.setSortingEnabled(False)
-        self.write_lock = True
 
         index = -1
         for i in range(self.table_widget.rowCount()):
@@ -445,7 +444,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             if last_history[2] in [3, 4]:
                 self.table_widget.item(index, last_history[2] + 1).setText(last_history[3])
 
-        self.write_lock = False
         self.table_widget.setSortingEnabled(True)
         self.current_data = self.get_data()
 
