@@ -61,6 +61,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.current_data = []
         self.history = []
         self.history_foreward = []
+        self.history_lock = False
         self.write_lock = False
 
         self.table_widget.cellChanged.connect(self.export_csv)
@@ -365,7 +366,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if self.write_lock:
             return
 
-        self.get_changes()
+        if not self.history_lock:
+            self.get_changes()
 
         path = self.get_csv_path()
 
@@ -413,6 +415,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.show_last_history()
 
     def undo_history(self, reverse=False):
+        self.history_lock = True
         last_history = None
         if not reverse:
             if len(self.history):
@@ -453,6 +456,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.current_data = self.get_data()
 
         self.show_last_history()
+        self.history_lock = False
 
     def show_last_history(self):
         if self.history:
