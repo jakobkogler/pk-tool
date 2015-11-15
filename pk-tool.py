@@ -272,10 +272,15 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         return self.csv_files[self.file_combobox.currentText()]
 
     def new_csv(self):
-        directory = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Uebungen/'
-        path = QFileDialog.getSaveFileName(self, 'Neue CSV-Datei', directory, '*.csv')[0]
+        path_suggestion = '/Anwesenheiten/Uebungen/' + self.group_combobox.currentText() + '_ue' + str(len(self.file_combobox) + 1) + '.csv'
+
+        directory = self.settings.value('Path/pk_repo', '')
+        path = QFileDialog.getSaveFileName(self, 'Neue CSV-Datei', directory + path_suggestion, '*.csv')[0]
         if not path:
             return
+
+        if not path.endswith('.csv'):
+            path += '.csv'
 
         with io.open(path, 'w', encoding='utf-8', newline='') as f:
             f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
