@@ -5,6 +5,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
 from mainwindow import Ui_MainWindow
 from settings import Ui_SettingsDialog
+from git_interactions import Ui_GitDialog
 import os
 import re
 import io
@@ -78,6 +79,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_combobox.currentIndexChanged.connect(self.populate_files)
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
         self.action_get_email.triggered.connect(self.get_email)
+        self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
@@ -105,7 +107,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.repo.head.reset(index=True, working_tree=False)
         files = self.repo.untracked_files + [info.a_path for info in self.repo.index.diff(None)]
-        print(files)
+        return files
 
     def show_about(self):
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
@@ -552,6 +554,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def write_console(self, text):
         self.console_output.setText(text)
 
+    def open_git_dialog(self):
+        git_dialog = GitDialog(self.repo, self.get_changed_or_untracked_files())
+        git_dialog.exec_()
+
 
 class SettingsDialog(QDialog, Ui_SettingsDialog):
     def __init__(self, settings, group_infos):
@@ -596,6 +602,23 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.settings.setValue('Path/pk_repo', self.line_edit_repo_path.text())
         self.settings.setValue('Personal/username', self.username_combobox.currentText())
 
+
+class GitDialog(QDialog, Ui_GitDialog):
+    def __init__(self, repo, files):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+        self.repo = repo
+        self.files = files
+
+        self.list_widget.clear()
+        self.list_widget.addItems(self.files)
+        self.list_widget.selectAll()
+
+        self.button_box.accepted.connect(self.commit_and_push)
+
+    def commit_and_push(self):
+        pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
