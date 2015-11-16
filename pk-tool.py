@@ -91,7 +91,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
                     self.use_git_interactions = False
                 else:
-                    self.get_changed_untracked_files()
+                    self.get_changed_or_untracked_files()
 
             if pk_repo_path:
                 self.get_group_infos()
@@ -99,14 +99,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         except:
             pass
 
-    def get_changed_untracked_files(self):
+    def get_changed_or_untracked_files(self):
         if not self.use_git_interactions:
             return
 
-        print(self.repo.untracked_files)
-
-
-
+        self.repo.head.reset(index=True, working_tree=False)
+        files = self.repo.untracked_files + [info.a_path for info in self.repo.index.diff(None)]
+        print(files)
 
     def show_about(self):
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
