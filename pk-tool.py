@@ -346,6 +346,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             for student in group.students:
                 if student.matrikelnr == matrikelnr:
                     return student
+        else:
+            return Student('', matrikelnr, '', self.group_combobox.currentText())
 
     def get_checkbox(self, index):
         """Returns the checkbox for a specific index
@@ -392,18 +394,19 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if len(data) == len(self.current_data):
             for new, current in zip(data, self.current_data):
                 if new != current:
-                    student = self.get_student(new[0]).name
+                    student = self.get_student(new[0])
+                    student_name = student.name if student.name else student.matrikelnr
                     if new[2] == 'an' != current[2]:
-                        text = '{} ist anwesend'.format(student)
+                        text = '{} ist anwesend'.format(student_name)
                         self.add_new_history((new[0], text, 2, 'ab', 'an'))
                     if new[2] == 'ab' !=  current[2]:
-                        text = '{} ist nicht anwesend'.format(student)
+                        text = '{} ist nicht anwesend'.format(student_name)
                         self.add_new_history((new[0], text, 2, 'an', 'ab'))
                     if new[3] != current[3]:
-                        text = '{} erreicht {} bei der Adhoc-Aufgabe'.format(student, new[3])
+                        text = '{} erreicht {} bei der Adhoc-Aufgabe'.format(student_name, new[3])
                         self.add_new_history((new[0], text, 3, current[3], new[3]))
                     if new[4] != current[4]:
-                        text = '{}: {}'.format(student, new[4])
+                        text = '{}: {}'.format(student_name, new[4])
                         self.add_new_history((new[0], text, 4, current[4], new[4]))
 
         self.current_data = data
