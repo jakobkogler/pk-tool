@@ -9,6 +9,8 @@ import os
 import re
 import io
 from collections import namedtuple
+from git import Repo, FetchInfo
+
 
 GroupInfos = namedtuple('GroupInfos', 'instructor, tutor1, tutor2')
 Group = namedtuple('Group', 'name type students')
@@ -79,12 +81,32 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
+        self.use_git_interactions = True
         try:
+            if pk_repo_path:
+                self.repo = Repo(pk_repo_path)
+                o = self.repo.remotes.origin
+                info = o.pull()[0]
+
+                if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
+                    self.use_git_interactions = False
+                else:
+                    self.get_changed_untracked_files()
+
             if pk_repo_path:
                 self.get_group_infos()
                 self.read_group_files()
         except:
             pass
+
+    def get_changed_untracked_files(self):
+        if not self.use_git_interactions:
+            return
+
+        print(self.repo.untracked_files)
+
+
+
 
     def show_about(self):
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
