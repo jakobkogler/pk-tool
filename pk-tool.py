@@ -10,8 +10,12 @@ import os
 import re
 import io
 from collections import namedtuple
-from git import Repo, FetchInfo
 
+use_git = True
+try:
+    from git import Repo, FetchInfo
+except ImportError:
+    use_git = False
 
 GroupInfos = namedtuple('GroupInfos', 'instructor, tutor1, tutor2')
 Group = namedtuple('Group', 'name type students')
@@ -54,7 +58,7 @@ def get_group_infos(path):
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, use_git):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
@@ -83,9 +87,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
-        self.use_git_interactions = True
+        self.use_git_interactions = use_git
         try:
-            if pk_repo_path:
+
+            if pk_repo_path and self.use_git_interactions:
                 self.repo = Repo(pk_repo_path)
                 o = self.repo.remotes.origin
                 info = o.pull()[0]
@@ -98,6 +103,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 self.read_group_files()
         except:
             pass
+
+        if not self.use_git_interactions:
+            self.action_commit_and_push.setDisabled(True)
 
     def get_changed_or_untracked_files(self):
         self.repo.head.reset(index=True, working_tree=False)
@@ -650,6 +658,6 @@ class GitDialog(QDialog, Ui_GitDialog):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = PkToolMainWindow()
+    window = PkToolMainWindow(use_git)
     window.show()
     sys.exit(app.exec_())
