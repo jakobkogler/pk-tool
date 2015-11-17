@@ -131,8 +131,11 @@ class Ui_MainWindow(object):
         self.action_about.setObjectName("action_about")
         self.action_get_email = QtWidgets.QAction(MainWindow)
         self.action_get_email.setObjectName("action_get_email")
+        self.action_commit_and_push = QtWidgets.QAction(MainWindow)
+        self.action_commit_and_push.setObjectName("action_commit_and_push")
         self.menuDatei.addAction(self.action_new)
         self.menuDatei.addAction(self.action_settings)
+        self.menuDatei.addAction(self.action_commit_and_push)
         self.menuBearbeiten.addAction(self.action_undo)
         self.menuBearbeiten.addAction(self.action_redo)
         self.menuBearbeiten.addAction(self.action_add_student)
@@ -169,4 +172,5 @@ class Ui_MainWindow(object):
         self.action_settings.setText(_translate("MainWindow", "Einstellungen"))
         self.action_about.setText(_translate("MainWindow", "About"))
         self.action_get_email.setText(_translate("MainWindow", "Kopiere E-Mails in die Zwischenablage"))
+        self.action_commit_and_push.setText(_translate("MainWindow", "Commit und Push"))
 

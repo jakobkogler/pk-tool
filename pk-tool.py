@@ -5,10 +5,17 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
 from mainwindow import Ui_MainWindow
 from settings import Ui_SettingsDialog
+from git_interactions import Ui_GitDialog
 import os
 import re
 import io
 from collections import namedtuple
+
+use_git = True
+try:
+    from git import Repo, FetchInfo
+except ImportError:
+    use_git = False
 
 GroupInfos = namedtuple('GroupInfos', 'instructor, tutor1, tutor2')
 Group = namedtuple('Group', 'name type students')
@@ -51,7 +58,7 @@ def get_group_infos(path):
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, use_git):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
@@ -76,15 +83,47 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_combobox.currentIndexChanged.connect(self.populate_files)
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
         self.action_get_email.triggered.connect(self.get_email)
+        self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
+        self.use_git_interactions = use_git
+        if self.settings.value('Git/use_git', 'False') != 'True':
+            self.use_git_interactions = False
+
         try:
+            self.try_git_pull()
             if pk_repo_path:
                 self.get_group_infos()
                 self.read_group_files()
         except:
             pass
+
+    def try_git_pull(self):
+        pk_repo_path = self.settings.value('Path/pk_repo', '')
+        if pk_repo_path and self.use_git_interactions:
+            try:
+                self.repo = Repo(pk_repo_path)
+                o = self.repo.remotes.origin
+                info = o.pull()[0]
+
+                if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
+                    self.use_git_interactions = False
+            except:
+                self.use_git_interactions = False
+            if not self.use_git_interactions:
+                QMessageBox.about(self, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
+                                  'Git-Interaktionen wurden für diese Session ausgeschaltet.')
+
+        if self.use_git_interactions:
+            self.action_commit_and_push.setEnabled(True)
+        else:
+            self.action_commit_and_push.setDisabled(True)
+
+    def get_changed_or_untracked_files(self):
+        self.repo.head.reset(index=True, working_tree=False)
+        files = self.repo.untracked_files + [info.a_path for info in self.repo.index.diff(None)]
+        return files
 
     def show_about(self):
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
@@ -95,6 +134,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         settings_dialog = SettingsDialog(self.settings, self.group_infos)
         settings_dialog.exec_()
+
+        self.use_git_interactions = self.settings.value('Git/use_git', 'False') == 'True'
+        self.try_git_pull()
         try:
             self.get_group_infos()
             self.read_group_files()
@@ -535,6 +577,11 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def write_console(self, text):
         self.console_output.setText(text)
 
+    def open_git_dialog(self):
+        if self.use_git_interactions:
+            git_dialog = GitDialog(self.repo, self.get_changed_or_untracked_files())
+            git_dialog.exec_()
+
 
 class SettingsDialog(QDialog, Ui_SettingsDialog):
     def __init__(self, settings, group_infos):
@@ -553,6 +600,9 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
             self.username_combobox.setCurrentIndex(tutor_names.index(tutor_name))
         except ValueError:
             pass
+
+        if self.settings.value('Git/use_git', 'False') == 'True':
+            self.git_interaction_check_box.setChecked(True);
 
         self.button_select_repo_path.clicked.connect(self.select_repo_path)
         self.buttonBox.accepted.connect(self.accept_settings)
@@ -578,10 +628,60 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
     def accept_settings(self):
         self.settings.setValue('Path/pk_repo', self.line_edit_repo_path.text())
         self.settings.setValue('Personal/username', self.username_combobox.currentText())
+        self.settings.setValue('Git/use_git', 'True' if self.git_interaction_check_box.isChecked() else 'False')
+
+
+class GitDialog(QDialog, Ui_GitDialog):
+    def __init__(self, repo, files):
+        QDialog.__init__(self)
+        self.setupUi(self)
+
+        self.repo = repo
+        self.files = files
+
+        self.list_widget.clear()
+        self.list_widget.addItems(self.files)
+        self.list_widget.selectAll()
+
+        self.button_box.accepted.connect(self.commit_and_push)
+
+    def commit_and_push(self):
+        error = False
+
+        o = self.repo.remotes.origin
+        info = o.pull()[0]
+        if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
+            error = True
+        else:
+            try:
+                files = [item.text() for item in self.list_widget.selectedItems()]
+                for file in files:
+                    self.repo.head.reset(index=True, working_tree=False)
+                    self.repo.git.add(file)
+
+                    pattern = re.compile('(\w\w\d\d\w)_ue')
+                    matches = pattern.search(file)
+                    group_name = ''
+                    if matches:
+                        group_name = matches.group(1)
+                    message = self.commit_message_line_edit.text().format(group_name=group_name)
+
+                    self.repo.index.commit(message)
+                self.repo.git.push()
+
+            except:
+                error = True
+
+        if error:
+            QMessageBox.about(self, 'Fehler', 'Es gab einen Fehler beim Committen der neuen Dateien. \n'
+                              'Bitte kontrollieren Sie das Git-Repository manuell.')
+        else:
+            if self.list_widget.selectedItems():
+                QMessageBox.about(self, 'Erfolgreich', 'Dateien erfolgreich committet.')
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = PkToolMainWindow()
+    window = PkToolMainWindow(use_git)
     window.show()
     sys.exit(app.exec_())

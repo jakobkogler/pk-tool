@@ -14,7 +14,13 @@
    <string>Einstellungen</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="3" column="0" colspan="3">
+   <item row="1" column="1">
+    <widget class="QComboBox" name="username_combobox"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="line_edit_repo_path"/>
+   </item>
+   <item row="4" column="0" colspan="3">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -23,9 +29,6 @@
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="line_edit_repo_path"/>
    </item>
    <item row="0" column="2">
     <widget class="QPushButton" name="button_select_repo_path">
@@ -48,8 +51,12 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="username_combobox"/>
+   <item row="2" column="0" colspan="3">
+    <widget class="QCheckBox" name="git_interaction_check_box">
+     <property name="text">
+      <string>Git-Interaktionen aktivieren (experimentell)</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

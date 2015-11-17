@@ -229,6 +229,7 @@
     </property>
     <addaction name="action_new"/>
     <addaction name="action_settings"/>
+    <addaction name="action_commit_and_push"/>
    </widget>
    <widget class="QMenu" name="menuBearbeiten">
     <property name="title">
@@ -285,6 +286,11 @@
   <action name="action_get_email">
    <property name="text">
     <string>Kopiere E-Mails in die Zwischenablage</string>
+   </property>
+  </action>
+  <action name="action_commit_and_push">
+   <property name="text">
+    <string>Commit und Push</string>
    </property>
   </action>
  </widget>
