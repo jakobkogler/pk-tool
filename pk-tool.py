@@ -88,23 +88,33 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.settings = QSettings('settings.ini', QSettings.IniFormat)
         pk_repo_path = self.settings.value('Path/pk_repo', '')
         self.use_git_interactions = use_git
+        if self.settings.value('Git/use_git', 'False') != 'True':
+            self.use_git_interactions = False
+
         try:
-
-            if pk_repo_path and self.use_git_interactions:
-                self.repo = Repo(pk_repo_path)
-                o = self.repo.remotes.origin
-                info = o.pull()[0]
-
-                if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
-                    self.use_git_interactions = False
-
+            self.try_git_pull()
             if pk_repo_path:
                 self.get_group_infos()
                 self.read_group_files()
         except:
             pass
 
-        if not self.use_git_interactions:
+    def try_git_pull(self):
+        pk_repo_path = self.settings.value('Path/pk_repo', '')
+        if pk_repo_path and self.use_git_interactions:
+            try:
+                self.repo = Repo(pk_repo_path)
+                o = self.repo.remotes.origin
+                info = o.pull()[0]
+
+                if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
+                    self.use_git_interactions = False
+            except:
+                self.use_git_interactions = False
+
+        if self.use_git_interactions:
+            self.action_commit_and_push.setEnabled(True)
+        else:
             self.action_commit_and_push.setDisabled(True)
 
     def get_changed_or_untracked_files(self):
@@ -121,6 +131,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         settings_dialog = SettingsDialog(self.settings, self.group_infos)
         settings_dialog.exec_()
+
+        self.use_git_interactions = self.settings.value('Git/use_git', 'False') == 'True'
+        self.try_git_pull()
         try:
             self.get_group_infos()
             self.read_group_files()
@@ -581,6 +594,9 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         except ValueError:
             pass
 
+        if self.settings.value('Git/use_git', 'False') == 'True':
+            self.git_interaction_check_box.setChecked(True);
+
         self.button_select_repo_path.clicked.connect(self.select_repo_path)
         self.buttonBox.accepted.connect(self.accept_settings)
         self.line_edit_repo_path.textChanged.connect(self.update_username)
@@ -605,6 +621,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
     def accept_settings(self):
         self.settings.setValue('Path/pk_repo', self.line_edit_repo_path.text())
         self.settings.setValue('Personal/username', self.username_combobox.currentText())
+        self.settings.setValue('Git/use_git', 'True' if self.git_interaction_check_box.isChecked() else 'False')
 
 
 class GitDialog(QDialog, Ui_GitDialog):
