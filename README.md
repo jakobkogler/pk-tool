@@ -64,6 +64,13 @@ Man kann die letzten Änderungen rückgängig machen, bzw. die rückgängig gema
 Allerdings geht die History verloren, sobald man auf eine andere CSV-Datei wechselt oder man das Programm schließt.  
 Zu finden sind die Befehle unter `Bearbeiten - Zurück` bzw. `Bearbeiten - Vor`. 
 
+### Git-Interaktionen
+
+Man kann unter Einstellungen den experimentelle Git-Interaktionen einstellen. 
+Experimentell deswegen, weil es noch nicht auf mehreren Systemen getestet wurde. 
+Falls man diesen Modus aktiviert, wird automatisch beim Starten des Programmes das PK-Repository gepullt, sodass man die neuesten Studentendaten bekommt. 
+Außerdem kann man nach dem Bearbeiten der Anwesenheitslisten die Änderungen direkt aus dem Programm heraus ins Git einchecken und pushen. 
+
 ## Licence ##
 
 Copyright (C) 2015 Jakob Kogler, [MIT License](https://raw.githubusercontent.com/jakobkogler/pk-tool/master/LICENSE.txt)
