@@ -42,7 +42,7 @@ class Ui_GitDialog(object):
     def retranslateUi(self, GitDialog):
         _translate = QtCore.QCoreApplication.translate
         GitDialog.setWindowTitle(_translate("GitDialog", "Commit und Push"))
-        self.commit_message_label.setText(_translate("GitDialog", "<html><head/><body><p>Commit-Nachricht: <br>Als Platzhalter kann man &quot;{group_name}&quot; verwenden. </p></body></html>"))
-        self.explanation_label.setText(_translate("GitDialog", "<html><head/><body><p>Folgende geänderte Anwesenheitslisten wurden gefunden.<br>Markieren Sie diejenigen Listen, die Sie ins PK-Repo commiten und pushen wollen. </p></body></html>"))
+        self.commit_message_label.setText(_translate("GitDialog", "<html><head/><body><p>Commit-Nachricht: <br>Als Platzhalter kann man &quot;{group_name}&quot; verwenden. <br>Dieser wird automatisch durch den Gruppennamen ersetzen.</p></body></html>"))
+        self.explanation_label.setText(_translate("GitDialog", "<html><head/><body><p>Folgende geänderte Anwesenheitslisten wurden gefunden.<br>Markieren Sie diejenigen Dateien, die Sie ins PK-Repo commiten und pushen wollen. </p></body></html>"))
         self.commit_message_line_edit.setText(_translate("GitDialog", "Anwesenheit {group_name}"))
 

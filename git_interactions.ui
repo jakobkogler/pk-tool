@@ -17,7 +17,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="commit_message_label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Commit-Nachricht: &lt;br&gt;Als Platzhalter kann man &amp;quot;{group_name}&amp;quot; verwenden. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Commit-Nachricht: &lt;br&gt;Als Platzhalter kann man &amp;quot;{group_name}&amp;quot; verwenden. &lt;br&gt;Dieser wird automatisch durch den Gruppennamen ersetzen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -44,7 +44,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="explanation_label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Folgende geänderte Anwesenheitslisten wurden gefunden.&lt;br&gt;Markieren Sie diejenigen Listen, die Sie ins PK-Repo commiten und pushen wollen. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Folgende geänderte Anwesenheitslisten wurden gefunden.&lt;br&gt;Markieren Sie diejenigen Dateien, die Sie ins PK-Repo commiten und pushen wollen. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
