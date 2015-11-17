@@ -12,6 +12,7 @@ Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogle
 
 * Python 3.4
 * PyQt 5.2.1
+* GitPython, falls man Git-Interaktionen wünscht (`pip install gitpython`)
 
 ## Benutzung ##
 
