@@ -111,6 +111,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     self.use_git_interactions = False
             except:
                 self.use_git_interactions = False
+            if not self.use_git_interactions:
+                QMessageBox.about(self, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
+                                  'Git-Interaktionen wurden für diese Session ausgeschaltet.')
 
         if self.use_git_interactions:
             self.action_commit_and_push.setEnabled(True)
