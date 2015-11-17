@@ -305,6 +305,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.file_combobox.clear()
         self.file_combobox.addItems(sorted(self.csv_files.keys()))
+        self.file_combobox.setCurrentIndex(self.file_combobox.count() - 1)
 
 
     def load_csv_file(self, path):
