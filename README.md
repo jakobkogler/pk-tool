@@ -6,7 +6,7 @@ Eine nette Gui, die PK-Tutoren während der Übungen unterstützen soll.
 
 ## Download
 
-Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.2/pk-tool.exe)
+Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.3/pk-tool.exe)
 
 ## Voraussetzungen ##
 
