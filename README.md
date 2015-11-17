@@ -71,6 +71,12 @@ Experimentell deswegen, weil es noch nicht auf mehreren Systemen getestet wurde.
 Falls man diesen Modus aktiviert, wird automatisch beim Starten des Programmes das PK-Repository gepullt, sodass man die neuesten Studentendaten bekommt. 
 Außerdem kann man nach dem Bearbeiten der Anwesenheitslisten die Änderungen direkt aus dem Programm heraus ins Git einchecken und pushen. 
 
+### Studenten-E-Mails
+
+Man kann außerdem eine Liste der E-Mails aller Stundenten einer Gruppe generieren. 
+Diese Liste wird automatisch in die Zwischenablage gelegt und kann anschließend mit `Strg-V` in ein Mail-Programm eingefügt werden. 
+Zu finden ist dieser Befehl unter `Bearbeiten - Studenten-E-Mails`. 
+
 ## Licence ##
 
 Copyright (C) 2015 Jakob Kogler, [MIT License](https://raw.githubusercontent.com/jakobkogler/pk-tool/master/LICENSE.txt)
