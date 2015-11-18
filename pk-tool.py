@@ -173,6 +173,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             if students:
                 self.groups[group_name] = Group(group_name, group_type, students)
 
+        self.group_type_combobox.clear()
         self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
         self.fill_group_names_combobox()
         self.populate_files()
