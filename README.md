@@ -27,7 +27,7 @@ Man kann die Anwesenheit eintragen (Häckchen setzen), die Adhoc-Aufgabe bewerte
 
 ### Eingabe via "Befehlen"
 
-Um keine Zeit beim Namensuchen zu vergäuden, kann man all diese Dinge auch mit "Befehlen" erledigen. 
+Um keine Zeit beim Namensuchen zu vergeuden, kann man all diese Dinge auch mit "Befehlen" erledigen.
 Die Syntax dafür ist: 
 
  - `name a`: Der Student `name` ist anwesend. 
