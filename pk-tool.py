@@ -1,15 +1,16 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
-    QHBoxLayout, QInputDialog, QMessageBox
-from PyQt5 import QtCore
-from PyQt5.QtCore import QSettings
-from mainwindow import Ui_MainWindow
-from settings import Ui_SettingsDialog
-from git_interactions import Ui_GitDialog
+import io
 import os
 import re
-import io
+import sys
 from collections import namedtuple
+
+from PyQt5 import QtCore
+from PyQt5.QtCore import QSettings
+from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
+    QHBoxLayout, QInputDialog, QMessageBox
+from ui.git_interactions import Ui_GitDialog
+from ui.mainwindow import Ui_MainWindow
+from ui.settings import Ui_SettingsDialog
 
 use_git = True
 try:
