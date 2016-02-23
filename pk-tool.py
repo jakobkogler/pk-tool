@@ -98,7 +98,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """Opens the settings-dialog, which allows to define the path to the pk-repo and the username
         Updates everything after closing.
         """
-        settings_dialog = SettingsDialog(self.settings, self.group_infos)
+        settings_dialog = SettingsDialog(self.settings)
         settings_dialog.exec_()
 
         self.use_git_interactions = self.settings.value('Git/use_git', 'False') == 'True'
@@ -551,22 +551,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
 
 class SettingsDialog(QDialog, Ui_SettingsDialog):
-    def __init__(self, settings, group_infos):
+    def __init__(self, settings):
         QDialog.__init__(self)
         self.setupUi(self)
 
         self.settings = settings
         pk_repo_path = self.settings.value('Path/pk_repo', '')
         self.line_edit_repo_path.setText(pk_repo_path)
-
-        tutor_names = sorted(set([''] + [group.tutor1 for group in group_infos.values()] +
-                                 [group.tutor2 for group in group_infos.values()]))
-        self.username_combobox.addItems(tutor_names)
-        tutor_name = self.settings.value('Personal/username', '')
-        try:
-            self.username_combobox.setCurrentIndex(tutor_names.index(tutor_name))
-        except ValueError:
-            pass
+        self.update_username()
 
         if self.settings.value('Git/use_git', 'False') == 'True':
             self.git_interaction_check_box.setChecked(True)
