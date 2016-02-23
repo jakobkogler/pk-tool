@@ -6,10 +6,13 @@ GroupInfo = namedtuple('GroupInfo', 'instructor, tutor1, tutor2, substitute1, su
 
 
 class GroupInfos:
-    """Reads and stores meta-data for all student groups.
-    This includes names, instructor and tutor names. """
+    """Parses the file "GRUPPEN.txt" and stores the data for all student groups.
+    This includes group, instructor and tutor names. """
 
-    def __init__(self, path):
+    def __init__(self, path='', repo_path=''):
+        if repo_path:
+            path = repo_path + '/GRUPPEN.txt'
+
         # split file into parts
         file_parts = []
 

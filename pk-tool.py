@@ -150,8 +150,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         and extracts all groups and the names of the instructor and the tutors.
         Saves this data as a dict.
         """
-        path = self.settings.value('Path/pk_repo', '') + '/GRUPPEN.txt'
-        group_infos = GroupInfos(path)
+        group_infos = GroupInfos(repo_path=self.settings.value('Path/pk_repo', ''))
         self.group_infos = group_infos.get_group_infos()
 
     def fill_group_names_combobox(self):
@@ -568,8 +567,8 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.line_edit_repo_path.textChanged.connect(self.update_username)
 
     def update_username(self):
-        path = self.line_edit_repo_path.text() + '/GRUPPEN.txt'
-        tutor_names = GroupInfos(path).tutor_names()
+        group_infos = GroupInfos(repo_path=self.line_edit_repo_path.text())
+        tutor_names = group_infos.tutor_names()
 
         self.username_combobox.clear()
         self.username_combobox.addItems(tutor_names)
