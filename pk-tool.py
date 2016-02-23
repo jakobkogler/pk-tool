@@ -57,13 +57,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if self.settings.value('Git/use_git', 'False') != 'True':
             self.use_git_interactions = False
 
-        try:
-            self.try_git_pull()
-            if pk_repo_path:
-                self.get_group_infos()
-                self.read_group_files()
-        except:
-            pass
+        self.try_reading_repo()
 
     def try_git_pull(self):
         pk_repo_path = self.settings.value('Path/pk_repo', '')
@@ -102,9 +96,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         settings_dialog.exec_()
 
         self.use_git_interactions = self.settings.value('Git/use_git', 'False') == 'True'
+        self.try_reading_repo()
+
+    def try_reading_repo(self):
         self.try_git_pull()
         try:
-            self.get_group_infos()
+            group_infos = GroupInfos(repo_path=self.settings.value('Path/pk_repo', ''))
+            self.group_infos = group_infos.get_group_infos()
             self.read_group_files()
         except:
             pass
@@ -144,14 +142,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.fill_group_names_combobox()
         self.populate_files()
         self.load_group_data()
-
-    def get_group_infos(self):
-        """Reads the file 'GRUPPEN.txt' from the pk-repo,
-        and extracts all groups and the names of the instructor and the tutors.
-        Saves this data as a dict.
-        """
-        group_infos = GroupInfos(repo_path=self.settings.value('Path/pk_repo', ''))
-        self.group_infos = group_infos.get_group_infos()
 
     def fill_group_names_combobox(self):
         """Populate the combobox with all the group names,
