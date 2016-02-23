@@ -67,7 +67,7 @@ class LessonTable(QTableWidget):
         lay_out = QHBoxLayout(check_widget)
         lay_out.addWidget(chk_bx)
         lay_out.setAlignment(QtCore.Qt.AlignCenter)
-        lay_out.setContentsMargins(0,0,0,0)
+        lay_out.setContentsMargins(0, 0, 0, 0)
         check_widget.setLayout(lay_out)
         self.setCellWidget(idx, 3, check_widget)
 
@@ -108,7 +108,7 @@ class LessonTable(QTableWidget):
                 comment = ' '.join(comment)
 
                 indices = [idx for idx in range(self.rowCount())
-                               if self.item(idx, 1).text() == matrikelnr]
+                           if self.item(idx, 1).text() == matrikelnr]
                 if len(indices) == 1:
                     idx = indices[0]
                 else:

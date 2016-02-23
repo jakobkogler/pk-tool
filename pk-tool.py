@@ -4,19 +4,19 @@ import sys
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QInputDialog, QMessageBox
 from ui.mainwindow import Ui_MainWindow
-from src.group_infos import GroupInfos, Student
+from src.group_infos import GroupInfos
 from src.settings import Settings
 from dialog.settingsdialog import SettingsDialog
 from dialog.gitdialog import GitDialog
 
 use_git = True
 try:
-    from git import Repo, FetchInfo
+    import git
 except ImportError:
     use_git = False
 
 
-class PkToolMainWindow(QMainWindow, Ui_MainWindow):
+class PkToolMainWindow(QMainWindow, Ui_MainWindow, QFileDialog, QMessageBox, QApplication, QInputDialog):
     def __init__(self, use_git):
         QMainWindow.__init__(self)
         self.setupUi(self)
@@ -26,7 +26,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.table_widget.set_action_undo(self.action_undo)
         self.table_widget.set_action_redo(self.action_redo)
-
+        self.file_combobox.currentIndexChanged.connect(self.load_group_data)
+        self.group_combobox.currentIndexChanged.connect(self.populate_files)
+        self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
         self.console.returnPressed.connect(self.execute_console)
         self.action_new.triggered.connect(self.new_csv)
         self.action_add_student.triggered.connect(self.new_student)
@@ -38,7 +40,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
         self.settings = Settings()
-        pk_repo_path = self.settings.repo_path
         self.use_git_interactions = use_git
         if not self.settings.use_git:
             self.use_git_interactions = False
@@ -49,11 +50,11 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         pk_repo_path = self.settings.repo_path
         if pk_repo_path and self.use_git_interactions:
             try:
-                self.repo = Repo(pk_repo_path)
+                self.repo = git.Repo(pk_repo_path)
                 o = self.repo.remotes.origin
                 info = o.pull()[0]
 
-                if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
+                if info.flags & (git.Fetchinfo.ERROR | git.Fetchinfo.REJECTED):
                     self.use_git_interactions = False
             except:
                 self.use_git_interactions = False
@@ -89,15 +90,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
         self.table_widget.set_group_infos(self.group_infos)
 
-        try:
-            self.group_type_combobox.currentIndexChanged.disconnect()
-        except:
-            pass
+        self.group_type_combobox.currentIndexChanged.disconnect()
+
         self.group_type_combobox.clear()
         self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
-        self.fill_group_names_combobox()
-        self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
 
+        self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
+        self.fill_group_names_combobox()
 
     def fill_group_names_combobox(self):
         """Populate the combobox with all the group names,
@@ -118,13 +117,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 allowed_types = ['fortgeschritten']
             group_names = self.group_infos.get_group_names(allowed_types=allowed_types)
 
-        try:
-            self.group_combobox.currentIndexChanged.disconnect()
-        except:
-            pass
+        self.group_combobox.currentIndexChanged.disconnect()
 
         self.group_combobox.clear()
-        group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]),name[2:]))
+        group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]), name[2:]))
         self.group_combobox.addItems(group_names)
 
         self.group_combobox.currentIndexChanged.connect(self.populate_files)
@@ -150,11 +146,11 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         group = self.group_infos.get_group_info(group_name)
         self.table_widget.prepair_table(group)
-        if (self.file_combobox.count()):
+        if self.file_combobox.count():
             self.table_widget.load_csv_file(self.get_csv_path())
 
     def get_email(self):
-        clipboard = QApplication.clipboard()
+        clipboard = QApplication.clipboard(self)
         group_name = self.group_combobox.currentText()
         group = self.group_infos.get_group_info(group_name)
         emails = [student.email for student in group.students]
@@ -166,7 +162,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         return self.csv_files[self.file_combobox.currentText()]
 
     def new_csv(self):
-        path_suggestion = '/Anwesenheiten/Uebungen/' + self.group_combobox.currentText() + '_ue' + str(len(self.file_combobox) + 1) + '.csv'
+        path_suggestion = '/Anwesenheiten/Uebungen/' + self.group_combobox.currentText() + '_ue' + \
+                          str(len(self.file_combobox) + 1) + '.csv'
 
         directory = self.settings.repo_path
         path = QFileDialog.getSaveFileName(self, 'Neue CSV-Datei', directory + path_suggestion, '*.csv')[0]
@@ -189,27 +186,22 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def populate_files(self):
         """Finds the csv files for this group and populates the combobox
         """
-        try:
-            self.file_combobox.currentIndexChanged.disconnect()
-        except:
-            #self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
-            #self.group_combobox.currentIndexChanged.connect(self.populate_files)
-            pass
+
+        self.file_combobox.currentIndexChanged.disconnect()
 
         group_name = self.group_combobox.currentText()
         path = self.settings.repo_path + '/Anwesenheiten/Uebungen/'
         self.csv_files = {os.path.join(os.path.basename(root), name): os.path.join(root, name)
-                 for root, dirs, files in os.walk(path)
-                 for name in files
-                 if name.startswith(group_name)}
+                          for root, dirs, files in os.walk(path)
+                          for name in files
+                          if name.startswith(group_name)}
 
         self.file_combobox.clear()
         self.file_combobox.addItems(sorted(self.csv_files.keys()))
         self.file_combobox.setCurrentIndex(self.file_combobox.count() - 1)
-        # TODO: move signal-slot-connection to __init__, but prevent load_group_data from calling
+
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
         self.load_group_data()
-
 
     def execute_console(self):
         """Executes a command from the console
