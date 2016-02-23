@@ -16,7 +16,7 @@ except ImportError:
     use_git = False
 
 
-class PkToolMainWindow(QMainWindow, Ui_MainWindow, QFileDialog, QMessageBox, QApplication, QInputDialog):
+class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, use_git):
         QMainWindow.__init__(self)
         self.setupUi(self)
@@ -40,29 +40,27 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow, QFileDialog, QMessageBox, QAp
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
         self.settings = Settings()
-        self.use_git_interactions = use_git
-        if not self.settings.use_git:
-            self.use_git_interactions = False
+        self.settings.use_git = self.settings.use_git and use_git
 
         self.try_reading_repo()
 
     def try_git_pull(self):
         pk_repo_path = self.settings.repo_path
-        if pk_repo_path and self.use_git_interactions:
+        if pk_repo_path and self.settings.use_git:
             try:
                 self.repo = git.Repo(pk_repo_path)
                 o = self.repo.remotes.origin
                 info = o.pull()[0]
 
                 if info.flags & (git.Fetchinfo.ERROR | git.Fetchinfo.REJECTED):
-                    self.use_git_interactions = False
+                    self.settings.use_git = False
             except:
-                self.use_git_interactions = False
-            if not self.use_git_interactions:
+                self.settings.use_git = False
+            if not self.settings.use_git:
                 QMessageBox.about(self, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
                                   'Git-Interaktionen wurden für diese Session ausgeschaltet.')
 
-        if self.use_git_interactions:
+        if self.settings.use_git:
             self.action_commit_and_push.setEnabled(True)
         else:
             self.action_commit_and_push.setDisabled(True)
@@ -82,7 +80,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow, QFileDialog, QMessageBox, QAp
         settings_dialog = SettingsDialog(self.settings)
         settings_dialog.exec_()
 
-        self.use_git_interactions = self.settings.use_git
         self.try_reading_repo()
 
     def try_reading_repo(self):
@@ -238,7 +235,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow, QFileDialog, QMessageBox, QAp
         self.console_output.setText(text)
 
     def open_git_dialog(self):
-        if self.use_git_interactions:
+        if self.settings.use_git:
             git_dialog = GitDialog(self.repo, self.get_changed_or_untracked_files())
             git_dialog.exec_()
 
