@@ -162,7 +162,7 @@
      </widget>
     </item>
     <item row="1" column="0" colspan="4">
-     <widget class="QTableWidget" name="table_widget">
+     <widget class="LessonTable" name="table_widget">
       <property name="focusPolicy">
        <enum>Qt::WheelFocus</enum>
       </property>
@@ -220,12 +220,12 @@
      <x>0</x>
      <y>0</y>
      <width>734</width>
-     <height>27</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuDatei">
     <property name="title">
-     <string>Datei</string>
+     <string>&amp;Datei</string>
     </property>
     <addaction name="action_new"/>
     <addaction name="action_settings"/>
@@ -233,7 +233,7 @@
    </widget>
    <widget class="QMenu" name="menuBearbeiten">
     <property name="title">
-     <string>Bearbeiten</string>
+     <string>&amp;Bearbeiten</string>
     </property>
     <addaction name="action_undo"/>
     <addaction name="action_redo"/>
@@ -252,7 +252,7 @@
   </widget>
   <action name="action_new">
    <property name="text">
-    <string>Neu</string>
+    <string>&amp;Neu</string>
    </property>
    <property name="toolTip">
     <string>Neu</string>
@@ -260,41 +260,48 @@
   </action>
   <action name="action_undo">
    <property name="text">
-    <string>Zurück</string>
+    <string>&amp;Zurück</string>
    </property>
   </action>
   <action name="action_redo">
    <property name="text">
-    <string>Vor</string>
+    <string>&amp;Vor</string>
    </property>
   </action>
   <action name="action_add_student">
    <property name="text">
-    <string>Student hinzufügen</string>
+    <string>&amp;Student hinzufügen</string>
    </property>
   </action>
   <action name="action_settings">
    <property name="text">
-    <string>Einstellungen</string>
+    <string>&amp;Einstellungen</string>
    </property>
   </action>
   <action name="action_about">
    <property name="text">
-    <string>About</string>
+    <string>&amp;About</string>
    </property>
   </action>
   <action name="action_get_email">
    <property name="text">
-    <string>Kopiere E-Mails in die Zwischenablage</string>
+    <string>&amp;Kopiere E-Mails in die Zwischenablage</string>
    </property>
   </action>
   <action name="action_commit_and_push">
    <property name="text">
-    <string>Commit und Push</string>
+    <string>&amp;Commit und Push</string>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>LessonTable</class>
+   <extends>QTableWidget</extends>
+   <header>src/lessontable.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

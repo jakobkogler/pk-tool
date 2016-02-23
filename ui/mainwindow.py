@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.5
+# Created by: PyQt5 UI code generator 5.5.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -81,7 +81,7 @@ class Ui_MainWindow(object):
         self.label_tutor2.setObjectName("label_tutor2")
         self.gridLayout_3.addWidget(self.label_tutor2, 2, 0, 1, 1)
         self.gridLayout_2.addWidget(self.groupBox, 0, 1, 1, 2)
-        self.table_widget = QtWidgets.QTableWidget(self.centralWidget)
+        self.table_widget = LessonTable(self.centralWidget)
         self.table_widget.setFocusPolicy(QtCore.Qt.WheelFocus)
         self.table_widget.setObjectName("table_widget")
         self.table_widget.setColumnCount(0)
@@ -108,7 +108,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.groupBox_3, 2, 0, 1, 4)
         MainWindow.setCentralWidget(self.centralWidget)
         self.menuBar = QtWidgets.QMenuBar(MainWindow)
-        self.menuBar.setGeometry(QtCore.QRect(0, 0, 734, 27))
+        self.menuBar.setGeometry(QtCore.QRect(0, 0, 734, 30))
         self.menuBar.setObjectName("menuBar")
         self.menuDatei = QtWidgets.QMenu(self.menuBar)
         self.menuDatei.setObjectName("menuDatei")
@@ -161,16 +161,17 @@ class Ui_MainWindow(object):
         self.label_tutor2.setText(_translate("MainWindow", "Tutor 2:"))
         self.table_widget.setSortingEnabled(True)
         self.label_2.setText(_translate("MainWindow", "Befehl: "))
-        self.menuDatei.setTitle(_translate("MainWindow", "Datei"))
-        self.menuBearbeiten.setTitle(_translate("MainWindow", "Bearbeiten"))
+        self.menuDatei.setTitle(_translate("MainWindow", "&Datei"))
+        self.menuBearbeiten.setTitle(_translate("MainWindow", "&Bearbeiten"))
         self.menu.setTitle(_translate("MainWindow", "?"))
-        self.action_new.setText(_translate("MainWindow", "Neu"))
+        self.action_new.setText(_translate("MainWindow", "&Neu"))
         self.action_new.setToolTip(_translate("MainWindow", "Neu"))
-        self.action_undo.setText(_translate("MainWindow", "Zurück"))
-        self.action_redo.setText(_translate("MainWindow", "Vor"))
-        self.action_add_student.setText(_translate("MainWindow", "Student hinzufügen"))
-        self.action_settings.setText(_translate("MainWindow", "Einstellungen"))
-        self.action_about.setText(_translate("MainWindow", "About"))
-        self.action_get_email.setText(_translate("MainWindow", "Kopiere E-Mails in die Zwischenablage"))
-        self.action_commit_and_push.setText(_translate("MainWindow", "Commit und Push"))
+        self.action_undo.setText(_translate("MainWindow", "&Zurück"))
+        self.action_redo.setText(_translate("MainWindow", "&Vor"))
+        self.action_add_student.setText(_translate("MainWindow", "&Student hinzufügen"))
+        self.action_settings.setText(_translate("MainWindow", "&Einstellungen"))
+        self.action_about.setText(_translate("MainWindow", "&About"))
+        self.action_get_email.setText(_translate("MainWindow", "&Kopiere E-Mails in die Zwischenablage"))
+        self.action_commit_and_push.setText(_translate("MainWindow", "&Commit und Push"))
 
+from src.lessontable import LessonTable
