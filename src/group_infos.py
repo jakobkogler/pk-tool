@@ -2,7 +2,7 @@ from collections import namedtuple
 import re
 
 
-GroupInfo = namedtuple('GroupInfo', 'instructor, tutor1, tutor2')
+GroupInfo = namedtuple('GroupInfo', 'instructor, tutor1, tutor2, substitute1, substitute2')
 
 
 class GroupInfos:
@@ -24,22 +24,25 @@ class GroupInfos:
                     file_parts[-1].append(line)
 
             # parse parts into group infos
-            name_regex = re.compile(r'(mo|di|mi|do|fr)\d{2}\w')
+            name_regex = re.compile(r'\[((mo|di|mi|do|fr)\d{2}\w)\]')
             for part in file_parts:
-                match = name_regex.search(line)
+                match = name_regex.search(part[0])
                 if match:
-                    group_name = match.group(0)
+                    group_name = match.group(1)
                 else:
                     continue
 
-                group = GroupInfo(instructor='', tutor1='', tutor2='')
+                info = dict()
                 for line in part[1:]:
-                    extract_name = lambda: line.split('=')[-1].strip()
-                    if line.startswith('leiter'):
-                        group.instructor = extract_name()
-                    if line.startswith('tutor1'):
-                        group.tutor1 = extract_name()
-                    if line.startswith('tutor2'):
-                        group.tutor2 = extract_name()
+                    for title in 'leiter tutor1 tutor2 ersatz1 ersatz2'.split():
+                        if line.startswith(title):
+                            info[title] = line.split('=')[-1].strip()
 
-                self.groups[group_name] = group
+                self.groups[group_name] = GroupInfo(instructor=info.get('leiter', ''),
+                                                    tutor1=info.get('tutor1', ''),
+                                                    tutor2=info.get('tutor2', ''),
+                                                    substitute1=info.get('ersatz1', ''),
+                                                    substitute2=info.get('ersatz2', ''))
+
+    def get_group_infos(self):
+        return self.groups
