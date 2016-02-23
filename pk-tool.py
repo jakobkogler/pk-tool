@@ -10,6 +10,7 @@ from ui.git_interactions import Ui_GitDialog
 from ui.mainwindow import Ui_MainWindow
 from ui.settings import Ui_SettingsDialog
 from src.group_infos import GroupInfos, Student
+from src.settings import Settings
 
 use_git = True
 try:
@@ -45,16 +46,16 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
-        self.settings = QSettings('settings.ini', QSettings.IniFormat)
-        pk_repo_path = self.settings.value('Path/pk_repo', '')
+        self.settings = Settings()
+        pk_repo_path = self.settings.get_repo_path()
         self.use_git_interactions = use_git
-        if self.settings.value('Git/use_git', 'False') != 'True':
+        if not self.settings.get_use_git():
             self.use_git_interactions = False
 
         self.try_reading_repo()
 
     def try_git_pull(self):
-        pk_repo_path = self.settings.value('Path/pk_repo', '')
+        pk_repo_path = self.settings.get_repo_path()
         if pk_repo_path and self.use_git_interactions:
             try:
                 self.repo = Repo(pk_repo_path)
@@ -89,13 +90,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         settings_dialog = SettingsDialog(self.settings)
         settings_dialog.exec_()
 
-        self.use_git_interactions = self.settings.value('Git/use_git', 'False') == 'True'
+        self.use_git_interactions = self.settings.get_use_git()
         self.try_reading_repo()
 
     def try_reading_repo(self):
         self.try_git_pull()
         try:
-            self.group_infos = GroupInfos(repo_path=self.settings.value('Path/pk_repo', ''))
+            self.group_infos = GroupInfos(repo_path=self.settings.get_repo_path())
             self.group_type_combobox.clear()
             self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
             self.fill_group_names_combobox()
@@ -112,7 +113,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         type_index = self.group_type_combobox.currentIndex()
 
         if type_index == 0:
-            tutor_name = self.settings.value('Personal/username', '')
+            tutor_name = self.settings.get_username()
             group_names = self.group_infos.get_involved_groups(tutor_name)
         else:
             allowed_types = []
@@ -239,7 +240,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def new_csv(self):
         path_suggestion = '/Anwesenheiten/Uebungen/' + self.group_combobox.currentText() + '_ue' + str(len(self.file_combobox) + 1) + '.csv'
 
-        directory = self.settings.value('Path/pk_repo', '')
+        directory = self.settings.get_repo_path()
         path = QFileDialog.getSaveFileName(self, 'Neue CSV-Datei', directory + path_suggestion, '*.csv')[0]
         if not path:
             return
@@ -261,7 +262,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """Finds the csv files for this group and populates the combobox
         """
         group_name = self.group_combobox.currentText()
-        path = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Uebungen/'
+        path = self.settings.get_repo_path() + '/Anwesenheiten/Uebungen/'
         self.csv_files = {os.path.join(os.path.basename(root), name): os.path.join(root, name)
                  for root, dirs, files in os.walk(path)
                  for name in files
@@ -511,11 +512,11 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.setupUi(self)
 
         self.settings = settings
-        pk_repo_path = self.settings.value('Path/pk_repo', '')
+        pk_repo_path = self.settings.get_repo_path()
         self.line_edit_repo_path.setText(pk_repo_path)
         self.update_username()
 
-        if self.settings.value('Git/use_git', 'False') == 'True':
+        if self.settings.get_use_git():
             self.git_interaction_check_box.setChecked(True)
 
         self.button_select_repo_path.clicked.connect(self.select_repo_path)
@@ -528,7 +529,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
 
         self.username_combobox.clear()
         self.username_combobox.addItems(tutor_names)
-        tutor_name = self.settings.value('Personal/username', '')
+        tutor_name = self.settings.get_username()
         try:
             self.username_combobox.setCurrentIndex(tutor_names.index(tutor_name))
         except ValueError:
@@ -540,9 +541,9 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
             self.line_edit_repo_path.setText(pk_repo_path)
 
     def accept_settings(self):
-        self.settings.setValue('Path/pk_repo', self.line_edit_repo_path.text())
-        self.settings.setValue('Personal/username', self.username_combobox.currentText())
-        self.settings.setValue('Git/use_git', 'True' if self.git_interaction_check_box.isChecked() else 'False')
+        self.settings.set_repo_path(self.line_edit_repo_path.text())
+        self.settings.set_username(self.username_combobox.currentText())
+        self.settings.set_use_git(self.git_interaction_check_box.isChecked())
 
 
 class GitDialog(QDialog, Ui_GitDialog):
