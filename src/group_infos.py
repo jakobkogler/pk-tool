@@ -10,39 +10,43 @@ class GroupInfos:
     This includes names, instructor and tutor names. """
 
     def __init__(self, path):
+        # split file into parts
+        file_parts = []
+
+        try:
+            with open(path, 'r', encoding='utf-8') as file:
+                name_simple_regex = re.compile(r'\[.*\]')
+
+                for line in file:
+                    if (name_simple_regex.search(line)):
+                        file_parts.append([])
+                    if file_parts:
+                        file_parts[-1].append(line)
+        except IOError:
+            pass
+
+        # parse parts into group infos
         self.groups = dict()
+        name_regex = re.compile(r'\[((mo|di|mi|do|fr)\d{2}\w)\]')
 
-        with open(path, 'r', encoding='utf-8') as file:
-            # split file into parts
-            file_parts = []
-            name_simple_regex = re.compile(r'\[.*\]')
+        for part in file_parts:
+            match = name_regex.search(part[0])
+            if match:
+                group_name = match.group(1)
+            else:
+                continue
 
-            for line in file:
-                if (name_simple_regex.search(line)):
-                    file_parts.append([])
-                if file_parts:
-                    file_parts[-1].append(line)
+            info = dict()
+            for line in part[1:]:
+                for title in 'leiter tutor1 tutor2 ersatz1 ersatz2'.split():
+                    if line.startswith(title) and '=' in line:
+                        info[title] = line.split('=')[-1].strip()
 
-            # parse parts into group infos
-            name_regex = re.compile(r'\[((mo|di|mi|do|fr)\d{2}\w)\]')
-            for part in file_parts:
-                match = name_regex.search(part[0])
-                if match:
-                    group_name = match.group(1)
-                else:
-                    continue
-
-                info = dict()
-                for line in part[1:]:
-                    for title in 'leiter tutor1 tutor2 ersatz1 ersatz2'.split():
-                        if line.startswith(title):
-                            info[title] = line.split('=')[-1].strip()
-
-                self.groups[group_name] = GroupInfo(instructor=info.get('leiter', ''),
-                                                    tutor1=info.get('tutor1', ''),
-                                                    tutor2=info.get('tutor2', ''),
-                                                    substitute1=info.get('ersatz1', ''),
-                                                    substitute2=info.get('ersatz2', ''))
+            self.groups[group_name] = GroupInfo(instructor=info.get('leiter', ''),
+                                                tutor1=info.get('tutor1', ''),
+                                                tutor2=info.get('tutor2', ''),
+                                                substitute1=info.get('ersatz1', ''),
+                                                substitute2=info.get('ersatz2', ''))
 
     def get_group_infos(self):
         return self.groups
