@@ -1,8 +1,5 @@
-from collections import namedtuple
 import re
-
-
-GroupInfo = namedtuple('GroupInfo', 'instructor, tutor1, tutor2, substitute1, substitute2')
+from src.group import Group
 
 
 class GroupInfos:
@@ -45,11 +42,12 @@ class GroupInfos:
                     if line.startswith(title) and '=' in line:
                         info[title] = line.split('=')[-1].strip()
 
-            self.groups[group_name] = GroupInfo(instructor=info.get('leiter', ''),
-                                                tutor1=info.get('tutor1', ''),
-                                                tutor2=info.get('tutor2', ''),
-                                                substitute1=info.get('ersatz1', ''),
-                                                substitute2=info.get('ersatz2', ''))
+            self.groups[group_name] = Group(name = group_name,
+                                            instructor=info.get('leiter', ''),
+                                            tutor1=info.get('tutor1', ''),
+                                            tutor2=info.get('tutor2', ''),
+                                            substitute1=info.get('ersatz1', ''),
+                                            substitute2=info.get('ersatz2', ''))
 
     def tutor_names(self):
         """Returns a list of the names of all tutors"""
@@ -60,8 +58,7 @@ class GroupInfos:
 
     def get_group_info(self, group_name):
         """Returns the info for a specific group"""
-        return self.groups.get(group_name, GroupInfo(instructor='', tutor1='', tutor2='',
-                                                     substitute1='', substitute2=''))
+        return self.groups.get(group_name, Group(group_name))
 
     def get_involved_groups(self, tutor_name):
         """Returns a list of names of all groups a tutor is involved in"""
