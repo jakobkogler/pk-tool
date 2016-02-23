@@ -183,10 +183,10 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         group_name = self.group_combobox.currentText()
         try:
-            infos = self.group_infos.get_group(group_name)
-            self.label_instructor_name.setText(infos.instructor)
-            self.label_tutor1_name.setText(infos.tutor1)
-            self.label_tutor2_name.setText(infos.tutor2)
+            info = self.group_infos.get_group_info(group_name)
+            self.label_instructor_name.setText(info.instructor)
+            self.label_tutor1_name.setText(info.tutor1)
+            self.label_tutor2_name.setText(info.tutor2)
         except KeyError:
             pass
 

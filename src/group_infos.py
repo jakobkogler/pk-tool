@@ -52,14 +52,17 @@ class GroupInfos:
                                                 substitute2=info.get('ersatz2', ''))
 
     def tutor_names(self):
+        """Returns a list of the names of all tutors"""
         groups = [[group.tutor1, group.tutor2, group.substitute1, group.substitute2] for group in self.groups.values()]
         names = set(name for group in groups for name in group)
         names.add('')
         return sorted(names)
 
-    def get_group(self, group_name):
+    def get_group_info(self, group_name):
+        """Returns the info for a specific group"""
         return self.groups.get(group_name, GroupInfo(instructor='', tutor1='', tutor2='',
                                                      substitute1='', substitute2=''))
 
     def get_involved_groups(self, tutor_name):
+        """Returns a list of names of all groups a tutor is involved in"""
         return [name for name, info in self.groups.items() if tutor_name in [info.tutor1, info.tutor2]]
