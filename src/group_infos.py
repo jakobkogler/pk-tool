@@ -16,7 +16,7 @@ class GroupInfos:
 
     def tutor_names(self):
         """Returns a list of the names of all tutors"""
-        groups = [[group.tutor1, group.tutor2, group.substitute1, group.substitute2] for group in self.groups.values()]
+        groups = [[group.tutor1, group.tutor2] for group in self.groups.values()]
         names = set(name for group in groups for name in group)
         names.add('')
         return sorted(names)

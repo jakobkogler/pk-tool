@@ -34,9 +34,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_redo.triggered.connect(lambda: self.table_widget.undo_history(True))
         self.action_about.triggered.connect(self.show_about)
         self.action_settings.triggered.connect(self.open_settings)
-        self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
-        self.group_combobox.currentIndexChanged.connect(self.populate_files)
-
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
@@ -89,19 +86,18 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
     def try_reading_repo(self):
         self.try_git_pull()
-        try:
-            self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
-            self.table_widget.set_group_infos(self.group_infos)
-            self.group_type_combobox.clear()
-            self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
-            self.fill_group_names_combobox()
-            self.populate_files()
-            self.load_group_data()
-            # TODO: move signal-slot-connection to __init__, but prevent load_group_data from calling
-            self.file_combobox.currentIndexChanged.connect(self.load_group_data)
+        self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
+        self.table_widget.set_group_infos(self.group_infos)
 
+        try:
+            self.group_type_combobox.currentIndexChanged.disconnect()
         except:
             pass
+        self.group_type_combobox.clear()
+        self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
+        self.fill_group_names_combobox()
+        self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
+
 
     def fill_group_names_combobox(self):
         """Populate the combobox with all the group names,
@@ -122,9 +118,17 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 allowed_types = ['fortgeschritten']
             group_names = self.group_infos.get_group_names(allowed_types=allowed_types)
 
+        try:
+            self.group_combobox.currentIndexChanged.disconnect()
+        except:
+            pass
+
         self.group_combobox.clear()
         group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]),name[2:]))
         self.group_combobox.addItems(group_names)
+
+        self.group_combobox.currentIndexChanged.connect(self.populate_files)
+        self.populate_files()
 
     def new_student(self):
         matrikelnr, ok = QInputDialog.getText(self, 'Neuen Studenten hinzufügen', 'Matrikelnummer:')
@@ -185,6 +189,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def populate_files(self):
         """Finds the csv files for this group and populates the combobox
         """
+        try:
+            self.file_combobox.currentIndexChanged.disconnect()
+        except:
+            #self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
+            #self.group_combobox.currentIndexChanged.connect(self.populate_files)
+            pass
+
         group_name = self.group_combobox.currentText()
         path = self.settings.repo_path + '/Anwesenheiten/Uebungen/'
         self.csv_files = {os.path.join(os.path.basename(root), name): os.path.join(root, name)
@@ -195,7 +206,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.file_combobox.clear()
         self.file_combobox.addItems(sorted(self.csv_files.keys()))
         self.file_combobox.setCurrentIndex(self.file_combobox.count() - 1)
-
+        # TODO: move signal-slot-connection to __init__, but prevent load_group_data from calling
+        self.file_combobox.currentIndexChanged.connect(self.load_group_data)
+        self.load_group_data()
 
 
     def execute_console(self):
