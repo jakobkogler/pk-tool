@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem
 from ui.git_interactions import Ui_GitDialog
 from ui.mainwindow import Ui_MainWindow
 from ui.settings import Ui_SettingsDialog
+from src.group_infos import GroupInfos
 
 use_git = True
 try:
@@ -18,44 +19,8 @@ try:
 except ImportError:
     use_git = False
 
-GroupInfos = namedtuple('GroupInfos', 'instructor, tutor1, tutor2')
 Group = namedtuple('Group', 'name type students')
 Student = namedtuple('Student', 'name matrikelnr email group_name')
-
-
-def get_group_infos(path):
-    """Reads the file 'GRUPPEN.txt' from the pk-repo,
-    and extracts all groups and the names of the instructor and the tutors.
-    Returns this data as a dict.
-    """
-    group_name_regex = re.compile('(mo|di|mi|do|fr)\d{2}\w')
-
-    with open(path, 'r', encoding='utf-8') as f:
-        group_name = ''
-        instructor = ''
-        tutor1 = ''
-        tutor2 = ''
-        group_infos = dict()
-
-        for line in f:
-            match = group_name_regex.search(line)
-            if match:
-                if group_name:
-                    group_infos[group_name] = GroupInfos(instructor, tutor1, tutor2)
-                group_name = match.group(0)
-            else:
-                extract_name = lambda: line.split('=')[-1].strip()
-                if line.startswith('leiter'):
-                    instructor = extract_name()
-                if line.startswith('tutor1'):
-                    tutor1 = extract_name()
-                if line.startswith('tutor2'):
-                    tutor2 = extract_name()
-
-        if group_name:
-            group_infos[group_name] = GroupInfos(instructor, tutor1, tutor2)
-
-        return group_infos
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
@@ -186,7 +151,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         Saves this data as a dict.
         """
         path = self.settings.value('Path/pk_repo', '') + '/GRUPPEN.txt'
-        self.group_infos = get_group_infos(path)
+        group_infos = GroupInfos(path)
+        self.group_infos = group_infos.get_group_infos()
 
     def fill_group_names_combobox(self):
         """Populate the combobox with all the group names,
@@ -611,7 +577,8 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.line_edit_repo_path.textChanged.connect(self.update_username)
 
     def update_username(self):
-        group_infos = get_group_infos(self.line_edit_repo_path.text() + '/GRUPPEN.txt')
+        group_infos_inst = GroupInfos(self.line_edit_repo_path.text() + '/GRUPPEN.txt')
+        group_infos = group_infos_inst.get_group_infos()
         tutor_names = sorted(set([''] + [group.tutor1 for group in group_infos.values()] +
                                  [group.tutor2 for group in group_infos.values()]))
         self.username_combobox.clear()
