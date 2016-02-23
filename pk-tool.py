@@ -410,7 +410,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                     if new[2] == 'an' != current[2]:
                         text = '{} ist anwesend'.format(student_name)
                         self.add_new_history((new[0], text, 2, 'ab', 'an'))
-                    if new[2] == 'ab' !=  current[2]:
+                    if new[2] == 'ab' != current[2]:
                         text = '{} ist nicht anwesend'.format(student_name)
                         self.add_new_history((new[0], text, 2, 'an', 'ab'))
                     if new[3] != current[3]:
@@ -522,7 +522,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             identification, command = commands[0], ' '.join(commands[1:])
             index = self.find_index(identification)
             if isinstance(index, int):
-                full_name = self.table_widget.item(index, 0).text()
                 if command == 'a':
                     self.get_checkbox(index).setCheckState(QtCore.Qt.Checked)
                 elif command == 'b':
@@ -570,7 +569,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
             pass
 
         if self.settings.value('Git/use_git', 'False') == 'True':
-            self.git_interaction_check_box.setChecked(True);
+            self.git_interaction_check_box.setChecked(True)
 
         self.button_select_repo_path.clicked.connect(self.select_repo_path)
         self.buttonBox.accepted.connect(self.accept_settings)
