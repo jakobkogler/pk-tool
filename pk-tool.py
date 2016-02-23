@@ -2,8 +2,6 @@ import io
 import os
 import re
 import sys
-from collections import namedtuple
-
 from PyQt5 import QtCore
 from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
@@ -11,16 +9,13 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem
 from ui.git_interactions import Ui_GitDialog
 from ui.mainwindow import Ui_MainWindow
 from ui.settings import Ui_SettingsDialog
-from src.group_infos import GroupInfos
+from src.group_infos import GroupInfos, Student
 
 use_git = True
 try:
     from git import Repo, FetchInfo
 except ImportError:
     use_git = False
-
-Group = namedtuple('Group', 'name type students')
-Student = namedtuple('Student', 'name matrikelnr email group_name')
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
@@ -29,7 +24,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         self.group_infos = GroupInfos(repo_path='')
-        self.groups = dict()
         self.csv_files = dict()
         self.current_data = []
         self.history = []
@@ -102,62 +96,33 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.try_git_pull()
         try:
             self.group_infos = GroupInfos(repo_path=self.settings.value('Path/pk_repo', ''))
-            self.read_group_files()
+            self.group_type_combobox.clear()
+            self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
+            self.fill_group_names_combobox()
+            self.populate_files()
+            self.load_group_data()
+
         except:
             pass
-
-    def read_group_files(self):
-        """Reads the files 'groups_fortgeschritten.txt' und 'groups_normal.txt',
-        and extracts all groups and student data.
-        Afterwards it fills all combo-boxes and load the first file
-        """
-        path_template = self.settings.value('Path/pk_repo', '') + '/Anwesenheiten/Anmeldung/groups_{group_type}.txt'
-
-        for group_type in 'fortgeschritten', 'normal':
-            with open(path_template.format(group_type=group_type), 'r', encoding='utf-8') as f:
-                group_name_regex = re.compile('(mo|di|mi|do|fr)\d{2}\w')
-                student_regex = re.compile('\s+[+✔]\s+(\D+)\s(\d+)\s(.*)\s?')
-
-                students = []
-                group_name = ''
-
-                for line in f:
-                    group_name_match = group_name_regex.search(line)
-                    students_match = student_regex.search(line)
-
-                    if group_name_match:
-                        if students:
-                            self.groups[group_name] = Group(group_name, group_type, students)
-                            students = []
-                        group_name = group_name_match.group(0)
-                    elif students_match:
-                        students.append(Student(*([students_match.group(i) for i in range(1, 4)] + [group_name])))
-
-            if students:
-                self.groups[group_name] = Group(group_name, group_type, students)
-
-        self.group_type_combobox.clear()
-        self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
-        self.fill_group_names_combobox()
-        self.populate_files()
-        self.load_group_data()
 
     def fill_group_names_combobox(self):
         """Populate the combobox with all the group names,
         that apply for the group type specified in the form.
         """
         type_index = self.group_type_combobox.currentIndex()
-        allowed_types = []
 
-        if type_index > 0:
-            if type_index != 2:
-                allowed_types.append('fortgeschritten')
-            if type_index != 3:
-                allowed_types.append('normal')
-            group_names = [group.name for group in self.groups.values() if group.type in allowed_types]
-        else:
+        if type_index == 0:
             tutor_name = self.settings.value('Personal/username', '')
             group_names = self.group_infos.get_involved_groups(tutor_name)
+        else:
+            allowed_types = []
+            if type_index == 1:
+                allowed_types = ['normal', 'fortgeschritten']
+            elif type_index == 2:
+                allowed_types = ['normal']
+            elif type_index == 3:
+                allowed_types = ['fortgeschritten']
+            group_names = self.group_infos.get_group_names(allowed_types=allowed_types)
 
         self.group_combobox.clear()
         group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]),name[2:]))
@@ -205,7 +170,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.setSortingEnabled(False)
         self.table_widget.setHorizontalHeaderLabels(labels)
 
-        for student in self.groups[group_name].students:
+        group = self.group_infos.get_group_info(group_name)
+        for student in group.students:
             self.add_row_to_table(student)
 
         self.load_csv_file(self.get_csv_path())
@@ -220,7 +186,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def get_email(self):
         clipboard = QApplication.clipboard()
         group_name = self.group_combobox.currentText()
-        emails = [student.email for student in self.groups[group_name].students]
+        group = self.group_infos.get_group_info(group_name)
+        emails = [student.email for student in group.students]
         clipboard.setText(', '.join(emails))
 
     def add_row_to_table(self, student):
@@ -340,7 +307,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def get_student(self, matrikelnr):
         """Finds the student object for a given matrikelnr
         """
-        for group in self.groups.values():
+        for group_name in self.group_infos.get_group_names():
+            group = self.group_infos.get_group_info(group_name)
             for student in group.students:
                 if student.matrikelnr == matrikelnr:
                     return student
