@@ -21,7 +21,7 @@ class GroupInfos:
                 name_simple_regex = re.compile(r'\[.*\]')
 
                 for line in file:
-                    if (name_simple_regex.search(line)):
+                    if name_simple_regex.search(line):
                         file_parts.append([])
                     if file_parts:
                         file_parts[-1].append(line)
