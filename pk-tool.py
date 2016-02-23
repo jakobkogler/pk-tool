@@ -3,7 +3,6 @@ import os
 import re
 import sys
 from PyQt5 import QtCore
-from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
     QHBoxLayout, QInputDialog, QMessageBox
 from ui.git_interactions import Ui_GitDialog
