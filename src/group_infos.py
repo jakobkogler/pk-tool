@@ -37,6 +37,16 @@ class GroupInfos:
         else:
             return [name for name in self.groups]
 
+    def get_student(self, matrikelnr):
+        """Finds the student object for a given matrikelnr
+        """
+        for group in self.groups.values():
+            for student in group.students:
+                if student.matrikelnr == matrikelnr:
+                    return student
+        else:
+            return Student('', matrikelnr, '', '')
+
     @staticmethod
     def __split_file_into_parts(filename, regex):
         file_parts = []
