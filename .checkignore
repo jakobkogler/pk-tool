@@ -1,3 +1,2 @@
-git_interactions.py
-mainwindow.py
-settings.py
+# Ignore all ui-files
+ui/*
