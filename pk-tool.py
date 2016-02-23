@@ -1,15 +1,14 @@
 import io
 import os
-import re
 import sys
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QFileDialog, QCheckBox, QWidget, \
     QHBoxLayout, QInputDialog, QMessageBox
-from ui.git_interactions import Ui_GitDialog
 from ui.mainwindow import Ui_MainWindow
-from ui.settings import Ui_SettingsDialog
 from src.group_infos import GroupInfos, Student
 from src.settings import Settings
+from dialog.settingsdialog import SettingsDialog
+from dialog.gitdialog import GitDialog
 
 use_git = True
 try:
@@ -503,95 +502,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if self.use_git_interactions:
             git_dialog = GitDialog(self.repo, self.get_changed_or_untracked_files())
             git_dialog.exec_()
-
-
-class SettingsDialog(QDialog, Ui_SettingsDialog):
-    def __init__(self, settings):
-        QDialog.__init__(self)
-        self.setupUi(self)
-
-        self.settings = settings
-        pk_repo_path = self.settings.get_repo_path()
-        self.line_edit_repo_path.setText(pk_repo_path)
-        self.update_username()
-
-        if self.settings.get_use_git():
-            self.git_interaction_check_box.setChecked(True)
-
-        self.button_select_repo_path.clicked.connect(self.select_repo_path)
-        self.buttonBox.accepted.connect(self.accept_settings)
-        self.line_edit_repo_path.textChanged.connect(self.update_username)
-
-    def update_username(self):
-        group_infos = GroupInfos(repo_path=self.line_edit_repo_path.text())
-        tutor_names = group_infos.tutor_names()
-
-        self.username_combobox.clear()
-        self.username_combobox.addItems(tutor_names)
-        tutor_name = self.settings.get_username()
-        try:
-            self.username_combobox.setCurrentIndex(tutor_names.index(tutor_name))
-        except ValueError:
-            pass
-
-    def select_repo_path(self):
-        pk_repo_path = QFileDialog.getExistingDirectory(self, 'Pfad zum PK-Repository', self.line_edit_repo_path.text(), QFileDialog.ShowDirsOnly)
-        if pk_repo_path:
-            self.line_edit_repo_path.setText(pk_repo_path)
-
-    def accept_settings(self):
-        self.settings.set_repo_path(self.line_edit_repo_path.text())
-        self.settings.set_username(self.username_combobox.currentText())
-        self.settings.set_use_git(self.git_interaction_check_box.isChecked())
-
-
-class GitDialog(QDialog, Ui_GitDialog):
-    def __init__(self, repo, files):
-        QDialog.__init__(self)
-        self.setupUi(self)
-
-        self.repo = repo
-        self.files = files
-
-        self.list_widget.clear()
-        self.list_widget.addItems(self.files)
-        self.list_widget.selectAll()
-
-        self.button_box.accepted.connect(self.commit_and_push)
-
-    def commit_and_push(self):
-        error = False
-
-        o = self.repo.remotes.origin
-        info = o.pull()[0]
-        if info.flags & (FetchInfo.ERROR | FetchInfo.REJECTED):
-            error = True
-        else:
-            try:
-                files = [item.text() for item in self.list_widget.selectedItems()]
-                for file in files:
-                    self.repo.head.reset(index=True, working_tree=False)
-                    self.repo.git.add(file)
-
-                    pattern = re.compile('(\w\w\d\d\w)_ue')
-                    matches = pattern.search(file)
-                    group_name = ''
-                    if matches:
-                        group_name = matches.group(1)
-                    message = self.commit_message_line_edit.text().format(group_name=group_name)
-
-                    self.repo.index.commit(message)
-                self.repo.git.push()
-
-            except:
-                error = True
-
-        if error:
-            QMessageBox.about(self, 'Fehler', 'Es gab einen Fehler beim Committen der neuen Dateien. \n'
-                              'Bitte kontrollieren Sie das Git-Repository manuell.')
-        else:
-            if self.list_widget.selectedItems():
-                QMessageBox.about(self, 'Erfolgreich', 'Dateien erfolgreich committet.')
 
 
 if __name__ == '__main__':
