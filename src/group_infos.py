@@ -38,7 +38,7 @@ class GroupInfos:
             return [name for name in self.groups]
 
     @staticmethod
-    def __split_file_into_parts(self, filename, regex):
+    def __split_file_into_parts(filename, regex):
         file_parts = []
 
         try:
