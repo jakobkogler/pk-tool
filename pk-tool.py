@@ -577,10 +577,9 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.line_edit_repo_path.textChanged.connect(self.update_username)
 
     def update_username(self):
-        group_infos_inst = GroupInfos(self.line_edit_repo_path.text() + '/GRUPPEN.txt')
-        group_infos = group_infos_inst.get_group_infos()
-        tutor_names = sorted(set([''] + [group.tutor1 for group in group_infos.values()] +
-                                 [group.tutor2 for group in group_infos.values()]))
+        path = self.line_edit_repo_path.text() + '/GRUPPEN.txt'
+        tutor_names = GroupInfos(path).tutor_names()
+
         self.username_combobox.clear()
         self.username_combobox.addItems(tutor_names)
         tutor_name = self.settings.value('Personal/username', '')
