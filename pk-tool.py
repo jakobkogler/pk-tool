@@ -28,7 +28,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
-        self.group_infos = dict()
+        self.group_infos = GroupInfos(repo_path='')
         self.groups = dict()
         self.csv_files = dict()
         self.current_data = []
@@ -101,8 +101,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def try_reading_repo(self):
         self.try_git_pull()
         try:
-            group_infos = GroupInfos(repo_path=self.settings.value('Path/pk_repo', ''))
-            self.group_infos = group_infos.get_group_infos()
+            self.group_infos = GroupInfos(repo_path=self.settings.value('Path/pk_repo', ''))
             self.read_group_files()
         except:
             pass
@@ -157,9 +156,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 allowed_types.append('normal')
             group_names = [group.name for group in self.groups.values() if group.type in allowed_types]
         else:
-            username = self.settings.value('Personal/username', '')
-            group_names = [group.name for group in self.groups.values() if self.group_infos[group.name].tutor1 == username or
-                           self.group_infos[group.name].tutor2 == username]
+            tutor_name = self.settings.value('Personal/username', '')
+            group_names = self.group_infos.get_involved_groups(tutor_name)
 
         self.group_combobox.clear()
         group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]),name[2:]))
@@ -185,7 +183,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         group_name = self.group_combobox.currentText()
         try:
-            infos = self.group_infos[group_name]
+            infos = self.group_infos.get_group(group_name)
             self.label_instructor_name.setText(infos.instructor)
             self.label_tutor1_name.setText(infos.tutor1)
             self.label_tutor2_name.setText(infos.tutor2)
