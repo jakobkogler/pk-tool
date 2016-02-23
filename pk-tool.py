@@ -52,7 +52,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 o = self.repo.remotes.origin
                 info = o.pull()[0]
 
-                if info.flags & (git.Fetchinfo.ERROR | git.Fetchinfo.REJECTED):
+                if info.flags & (git.FetchInfo.ERROR | git.FetchInfo.REJECTED):
                     self.settings.use_git = False
             except:
                 self.settings.use_git = False
