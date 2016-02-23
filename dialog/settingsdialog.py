@@ -8,11 +8,11 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.setupUi(self)
 
         self.settings = settings
-        pk_repo_path = self.settings.get_repo_path()
+        pk_repo_path = self.settings.repo_path
         self.line_edit_repo_path.setText(pk_repo_path)
         self.update_username()
 
-        if self.settings.get_use_git():
+        if self.settings.use_git:
             self.git_interaction_check_box.setChecked(True)
 
         self.button_select_repo_path.clicked.connect(self.select_repo_path)
@@ -25,7 +25,7 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
 
         self.username_combobox.clear()
         self.username_combobox.addItems(tutor_names)
-        tutor_name = self.settings.get_username()
+        tutor_name = self.settings.username
         try:
             self.username_combobox.setCurrentIndex(tutor_names.index(tutor_name))
         except ValueError:
@@ -37,6 +37,6 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
             self.line_edit_repo_path.setText(pk_repo_path)
 
     def accept_settings(self):
-        self.settings.set_repo_path(self.line_edit_repo_path.text())
-        self.settings.set_username(self.username_combobox.currentText())
-        self.settings.set_use_git(self.git_interaction_check_box.isChecked())
+        self.settings.repo_path = self.line_edit_repo_path.text()
+        self.settings.username = self.username_combobox.currentText()
+        self.settings.use_git = self.git_interaction_check_box.isChecked()

@@ -45,15 +45,15 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
         self.settings = Settings()
-        pk_repo_path = self.settings.get_repo_path()
+        pk_repo_path = self.settings.repo_path
         self.use_git_interactions = use_git
-        if not self.settings.get_use_git():
+        if not self.settings.use_git:
             self.use_git_interactions = False
 
         self.try_reading_repo()
 
     def try_git_pull(self):
-        pk_repo_path = self.settings.get_repo_path()
+        pk_repo_path = self.settings.repo_path
         if pk_repo_path and self.use_git_interactions:
             try:
                 self.repo = Repo(pk_repo_path)
@@ -88,13 +88,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         settings_dialog = SettingsDialog(self.settings)
         settings_dialog.exec_()
 
-        self.use_git_interactions = self.settings.get_use_git()
+        self.use_git_interactions = self.settings.use_git
         self.try_reading_repo()
 
     def try_reading_repo(self):
         self.try_git_pull()
         try:
-            self.group_infos = GroupInfos(repo_path=self.settings.get_repo_path())
+            self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
             self.group_type_combobox.clear()
             self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
             self.fill_group_names_combobox()
@@ -111,7 +111,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         type_index = self.group_type_combobox.currentIndex()
 
         if type_index == 0:
-            tutor_name = self.settings.get_username()
+            tutor_name = self.settings.username
             group_names = self.group_infos.get_involved_groups(tutor_name)
         else:
             allowed_types = []
@@ -238,7 +238,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def new_csv(self):
         path_suggestion = '/Anwesenheiten/Uebungen/' + self.group_combobox.currentText() + '_ue' + str(len(self.file_combobox) + 1) + '.csv'
 
-        directory = self.settings.get_repo_path()
+        directory = self.settings.repo_path
         path = QFileDialog.getSaveFileName(self, 'Neue CSV-Datei', directory + path_suggestion, '*.csv')[0]
         if not path:
             return
@@ -260,7 +260,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """Finds the csv files for this group and populates the combobox
         """
         group_name = self.group_combobox.currentText()
-        path = self.settings.get_repo_path() + '/Anwesenheiten/Uebungen/'
+        path = self.settings.repo_path + '/Anwesenheiten/Uebungen/'
         self.csv_files = {os.path.join(os.path.basename(root), name): os.path.join(root, name)
                  for root, dirs, files in os.walk(path)
                  for name in files

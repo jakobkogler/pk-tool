@@ -8,22 +8,28 @@ class Settings:
                                 'use-git': ('Git/use_git', 'False'),
                                 'username': ('Personal/username', '')}
 
-    def get_repo_path(self):
+    @property
+    def repo_path(self):
         return self.__get_value('repo-path')
 
-    def set_repo_path(self, repo_path):
+    @repo_path.setter
+    def repo_path(self, repo_path):
         self.__set_value('repo-path', repo_path)
 
-    def get_use_git(self):
+    @property
+    def use_git(self):
         return self.__get_value('use-git') == 'True'
 
-    def set_use_git(self, use_git):
+    @use_git.setter
+    def use_git(self, use_git):
         self.__set_value('use-git', 'True' if use_git else 'False')
 
-    def get_username(self):
+    @property
+    def username(self):
         return self.__get_value('username')
 
-    def set_username(self, username):
+    @username.setter
+    def username(self, username):
         self.__set_value('username', username)
 
     def __get_value(self, short_key):
