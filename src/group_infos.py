@@ -48,7 +48,7 @@ class GroupInfos:
         return self.groups
 
     def tutor_names(self):
-        extracted = [[group.tutor1, group.tutor2, group.substitue1, group.substitue2] for group in self.groups.values()]
+        extracted = [[group.tutor1, group.tutor2, group.substitute1, group.substitute2] for group in self.groups.values()]
         names = set(name for group in extracted for name in group)
         names.add('')
         return sorted(names)
