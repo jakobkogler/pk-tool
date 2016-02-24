@@ -71,7 +71,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         Read all important data from the pk-repo and fill all comboboxes accordingly
         """
-        self.git_interactions.git_pull()
+        self.git_interactions.pull_and_react()
         self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
         self.table_widget.connect(self.group_infos, self.action_undo, self.action_redo,
                                   self.get_csv_path, self.write_console)

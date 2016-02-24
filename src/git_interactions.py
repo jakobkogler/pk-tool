@@ -23,9 +23,24 @@ class GitInteractions:
         if 'git' not in sys.modules:
             self.settings.use_git = False
 
-    def git_pull(self):
+    def pull_and_react(self):
         """
         Try git pull. If error, set use-git in settings to False and print error-message.
+        """
+        success = self.pull()
+        if not success:
+            self.settings.use_git = False
+            QMessageBox.about(None, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
+                              'Git-Interaktionen wurden für diese Session ausgeschaltet.')
+
+        if self.settings.use_git:
+            self.action_commit_and_push.setEnabled(True)
+        else:
+            self.action_commit_and_push.setDisabled(True)
+
+    def pull(self):
+        """
+        Try git pull. Return a boolean indicating success or failure.
         """
         pk_repo_path = self.settings.repo_path
         if pk_repo_path and self.settings.use_git:
@@ -33,16 +48,38 @@ class GitInteractions:
                 self.repo = git.Repo(pk_repo_path)
                 o = self.repo.remotes.origin
                 info = o.pull()[0]
-
-                if info.flags & (git.FetchInfo.ERROR | git.FetchInfo.REJECTED):
-                    self.settings.use_git = False
+                return not (info.flags & (git.FetchInfo.ERROR | git.FetchInfo.REJECTED))
             except:
-                self.settings.use_git = False
-            if not self.settings.use_git:
-                QMessageBox.about(self, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
-                                  'Git-Interaktionen wurden für diese Session ausgeschaltet.')
+                return False
+        return False
 
-        if self.settings.use_git:
-            self.action_commit_and_push.setEnabled(True)
-        else:
-            self.action_commit_and_push.setDisabled(True)
+    def commit_file(self, file, message):
+        """
+        Try commiting a file. Return a boolean indicating success or failure.
+        """
+        try:
+            self.repo.head.reset(index=True, working_tree=False)
+            self.repo.git.add(file)
+
+            self.repo.index.commit(message)
+            return True
+        except:
+            return False
+
+    def push(self):
+        """
+        Try git push. Return a boolean indicating success or failure.
+        """
+        try:
+            self.repo.git.push()
+            return True
+        except:
+            return False
+
+    def get_changed_or_untracked_files(self):
+        """
+        Returns a list of files, which have been modified or haven't been tracked yet.
+        """
+        self.repo.head.reset(index=True, working_tree=False)
+        files = self.repo.untracked_files + [info.a_path for info in self.repo.index.diff(None)]
+        return files
