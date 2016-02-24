@@ -63,11 +63,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.action_commit_and_push.setDisabled(True)
 
-    def get_changed_or_untracked_files(self):
-        self.repo.head.reset(index=True, working_tree=False)
-        files = self.repo.untracked_files + [info.a_path for info in self.repo.index.diff(None)]
-        return files
-
     def show_about(self):
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
 
@@ -234,7 +229,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
     def open_git_dialog(self):
         if self.settings.use_git:
-            git_dialog = GitDialog(self.repo, self.get_changed_or_untracked_files())
+            git_dialog = GitDialog(self.repo)
             git_dialog.exec_()
 
 

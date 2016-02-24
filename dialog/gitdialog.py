@@ -9,20 +9,31 @@ except ImportError:
 
 
 class GitDialog(QDialog, Ui_GitDialog):
-    def __init__(self, repo, files):
+    """
+    Dialog to add and commit files to the pk-repo.
+    """
+
+    def __init__(self, repo):
+        """
+        Initialize everything. Show modified files.
+        """
         QDialog.__init__(self)
         self.setupUi(self)
 
         self.repo = repo
-        self.files = files
 
         self.list_widget.clear()
-        self.list_widget.addItems(self.files)
+        self.list_widget.addItems(self.get_changed_or_untracked_files())
         self.list_widget.selectAll()
 
         self.button_box.accepted.connect(self.commit_and_push)
 
     def commit_and_push(self):
+        """
+        Commit every marked file with a separate commit.
+        Push at the end.
+        Print error-message if an error occurred.
+        """
         error = False
 
         o = self.repo.remotes.origin
@@ -55,3 +66,11 @@ class GitDialog(QDialog, Ui_GitDialog):
         else:
             if self.list_widget.selectedItems():
                 QMessageBox.about(self, 'Erfolgreich', 'Dateien erfolgreich committet.')
+
+    def get_changed_or_untracked_files(self):
+        """
+        Returns a list of files, which have been modified or haven't been tracked yet.
+        """
+        self.repo.head.reset(index=True, working_tree=False)
+        files = self.repo.untracked_files + [info.a_path for info in self.repo.index.diff(None)]
+        return files
