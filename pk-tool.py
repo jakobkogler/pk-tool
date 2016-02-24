@@ -149,7 +149,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         Determine all email-adresses from the current group and push the into the clipboard.
         """
-        clipboard = QApplication.clipboard(self)
+        clipboard = QApplication.clipboard()
         group_name = self.group_combobox.currentText()
         group = self.group_infos.get_group_info(group_name)
         emails = [student.email for student in group.students]
