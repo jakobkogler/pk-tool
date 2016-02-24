@@ -24,7 +24,6 @@ class LessonTable(QTableWidget):
         self.history = []
         self.history_foreward = []
         self.current_data = []
-        self.history_lock = False
         self.group_infos = None
         self.action_redo = None
         self.action_undo = None
@@ -50,8 +49,7 @@ class LessonTable(QTableWidget):
         Change the count of the attendance column.
         """
         if not self.react_lock:
-            if not self.history_lock:
-                self.record_changes()
+            self.record_changes()
             self.export_csv()
 
             count = sum(self.get_checkbox(index).isChecked() for index in range(self.rowCount()))
@@ -272,7 +270,6 @@ class LessonTable(QTableWidget):
         Undos/redos the last history.
         """
         self.react_lock = True
-        self.history_lock = True
         self.setSortingEnabled(False)
 
         last_history = None
@@ -309,7 +306,6 @@ class LessonTable(QTableWidget):
             self.adjust_undo_redo()
 
         self.setSortingEnabled(True)
-        self.history_lock = False
         self.react_lock = False
         self.export_csv()
 
