@@ -238,7 +238,6 @@
     <addaction name="action_undo"/>
     <addaction name="action_redo"/>
     <addaction name="action_add_student"/>
-    <addaction name="action_get_email"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -246,8 +245,15 @@
     </property>
     <addaction name="action_about"/>
    </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Too&amp;ls</string>
+    </property>
+    <addaction name="action_get_email"/>
+   </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuBearbeiten"/>
+   <addaction name="menuTools"/>
    <addaction name="menu"/>
   </widget>
   <action name="action_new">
