@@ -7,7 +7,18 @@ Student = namedtuple('Student', 'name matrikelnr email group_name')
 
 
 class GroupInfos:
+    """
+    Reads, parses and stores all information about all groups,
+    like the names of the groups, the names of the instructors and tutors,
+    and the names, register-numbers and emails of all students.
+    """
+
     def __init__(self, repo_path=''):
+        """
+        Initializes the instance. Reads and parses all the infos from files in the pk repo.
+        :param repo_path: path to the pk-repo
+        """
+
         self.repo_path = repo_path
         self.groups = dict()
 
@@ -15,31 +26,48 @@ class GroupInfos:
         self.__read_student_lists()
 
     def tutor_names(self):
-        """Returns a list of the names of all tutors"""
+        """
+        Returns a list of the names of all tutors
+        """
+
         groups = [[group.tutor1, group.tutor2] for group in self.groups.values()]
         names = set(name for group in groups for name in group)
         names.add('')
         return sorted(names)
 
     def get_group_info(self, group_name):
-        """Returns the info for a specific group"""
+        """
+        Returns the info for a specific group
+        """
+
         if group_name not in self.groups:
             self.groups[group_name] = Group(group_name)
         return self.groups[group_name]
 
     def get_involved_groups(self, tutor_name):
-        """Returns a list of names of all groups a tutor is involved in"""
+        """
+        Returns a list of names of all groups a tutor is involved in
+        """
+
         return [name for name, info in self.groups.items() if tutor_name in [info.tutor1, info.tutor2]]
 
     def get_group_names(self, allowed_types=None):
-        if allowed_types:
-            return [name for name, group in self.groups.items() if group.group_type in allowed_types]
-        else:
+        """
+        Returns a list of group names, which are of a certain type that can be specified the
+        parameter allowed_types, which is a list of strings like 'normal' or 'fortgeschritten'.
+        If allowed_types is None, a list of all groups is returned.
+        """
+
+        if allowed_types is None:
             return [name for name in self.groups]
+        else:
+            return [name for name, group in self.groups.items() if group.group_type in allowed_types]
 
     def get_student(self, matrikelnr):
-        """Finds the student object for a given matrikelnr
         """
+        Finds the student object for a given matrikelnr
+        """
+
         for group in self.groups.values():
             for student in group.students:
                 if student.matrikelnr == matrikelnr:
@@ -49,6 +77,10 @@ class GroupInfos:
 
     @staticmethod
     def __split_file_into_parts(filename, regex):
+        """
+        Splits the lines of a file into parts. It starts a new part if the line matches a regex.
+        """
+
         file_parts = []
 
         try:
@@ -64,8 +96,10 @@ class GroupInfos:
         return file_parts
 
     def __read_group_infos(self):
-        """Parses the file "GRUPPEN.txt" and stores the data for all student groups.
-        This includes group, instructor and tutor names. """
+        """
+        Parses the file "GRUPPEN.txt" and stores the data for all student groups.
+        This includes group, instructor and tutor names.
+        """
 
         path = self.repo_path + '/GRUPPEN.txt'
         name_regex = re.compile(r'\[((mo|di|mi|do|fr)\d{2}\w)\]')
@@ -92,8 +126,10 @@ class GroupInfos:
                                             substitute2=info.get('ersatz2', ''))
 
     def __read_student_lists(self):
-        """Reads the files 'groups_fortgeschritten.txt' und 'groups_normal.txt',
-        and extracts all groups and student data."""
+        """
+        Reads the files 'groups_fortgeschritten.txt' und 'groups_normal.txt',
+        and extracts all groups and student data.
+        """
 
         path_template = self.repo_path + '/Anwesenheiten/Anmeldung/groups_{group_type}.txt'
         group_name_regex = re.compile('(mo|di|mi|do|fr)\d{2}\w')
