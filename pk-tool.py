@@ -24,8 +24,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_infos = GroupInfos(repo_path='')
         self.csv_files = dict()
 
-        self.table_widget.set_action_undo(self.action_undo)
-        self.table_widget.set_action_redo(self.action_redo)
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
         self.group_combobox.currentIndexChanged.connect(self.populate_files)
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
@@ -85,7 +83,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
     def try_reading_repo(self):
         self.try_git_pull()
         self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
-        self.table_widget.set_group_infos(self.group_infos)
+        self.table_widget.connect(self.group_infos, self.action_undo, self.action_redo, self.get_csv_path, self.write_console)
 
         self.group_type_combobox.currentIndexChanged.disconnect()
 
@@ -94,6 +92,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
         self.fill_group_names_combobox()
+
+    def write_console(self, text):
+        self.console_output.setText(text)
 
     def fill_group_names_combobox(self):
         """Populate the combobox with all the group names,
@@ -142,7 +143,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             pass
 
         group = self.group_infos.get_group_info(group_name)
-        self.table_widget.prepair_table(group)
+        self.table_widget.setup_table(group)
         if self.file_combobox.count():
             self.table_widget.load_csv_file(self.get_csv_path())
 
@@ -210,8 +211,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         try:
             commands = self.console.text().split(' ')
             identification, command = commands[0], ' '.join(commands[1:])
-            index = self.find_index(identification)
-            if isinstance(index, int):
+            index = self.table_widget.index_of_student(identification)
+            if index >= 0:
                 if command == 'a':
                     self.table_widget.get_checkbox(index).setCheckState(QtCore.Qt.Checked)
                 elif command == 'b':
@@ -221,7 +222,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     self.table_widget.item(index, 5).setText(command)
             else:
-                if len(index) == 0:
+                if index == -1:
                     error = 'Der Student "{}" wurde nicht gefunden.'
                 else:
                     error = 'Mehrere Studenten treffen auf "{}" zu.'
@@ -230,9 +231,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             pass
 
         self.console.clear()
-
-    def write_console(self, text):
-        self.console_output.setText(text)
 
     def open_git_dialog(self):
         if self.settings.use_git:
