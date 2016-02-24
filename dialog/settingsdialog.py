@@ -2,8 +2,16 @@ from PyQt5.QtWidgets import QDialog, QFileDialog
 from ui.settings import Ui_SettingsDialog
 from src.group_infos import GroupInfos
 
+
 class SettingsDialog(QDialog, Ui_SettingsDialog):
+    """
+    Dialog for changing settings
+    """
+
     def __init__(self, settings):
+        """
+        Initialize everything. Load current settings.
+        """
         QDialog.__init__(self)
         self.setupUi(self)
 
@@ -20,6 +28,9 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
         self.line_edit_repo_path.textChanged.connect(self.update_username)
 
     def update_username(self):
+        """
+        Determine all tutor-names, fill the combobox and select the name from the settings.
+        """
         group_infos = GroupInfos(repo_path=self.line_edit_repo_path.text())
         tutor_names = group_infos.tutor_names()
 
@@ -32,11 +43,18 @@ class SettingsDialog(QDialog, Ui_SettingsDialog):
             pass
 
     def select_repo_path(self):
-        pk_repo_path = QFileDialog.getExistingDirectory(self, 'Pfad zum PK-Repository', self.line_edit_repo_path.text(), QFileDialog.ShowDirsOnly)
+        """
+        Open a dialog to select the pk-repo-folder
+        """
+        pk_repo_path = QFileDialog.getExistingDirectory(self, 'Pfad zum PK-Repository',
+                                                        self.line_edit_repo_path.text(), QFileDialog.ShowDirsOnly)
         if pk_repo_path:
             self.line_edit_repo_path.setText(pk_repo_path)
 
     def accept_settings(self):
+        """
+        Store the current selections in the settings
+        """
         self.settings.repo_path = self.line_edit_repo_path.text()
         self.settings.username = self.username_combobox.currentText()
         self.settings.use_git = self.git_interaction_check_box.isChecked()
