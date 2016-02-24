@@ -78,7 +78,7 @@ Außerdem kann man nach dem Bearbeiten der Anwesenheitslisten die Änderungen di
 
 Man kann außerdem eine Liste der E-Mails aller Stundenten einer Gruppe generieren. 
 Diese Liste wird automatisch in die Zwischenablage gelegt und kann anschließend mit `Strg-V` in ein Mail-Programm eingefügt werden. 
-Zu finden ist dieser Befehl unter `Bearbeiten - Studenten-E-Mails`. 
+Zu finden ist dieser Befehl unter `Tools - Studenten-E-Mails`. 
 
 ## Licence ##
 
