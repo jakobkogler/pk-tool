@@ -2,7 +2,7 @@
 
 [![Code Issues](https://www.quantifiedcode.com/api/v1/project/15d009b4ae1f4b8f948010be53a73746/badge.svg)](https://www.quantifiedcode.com/app/project/15d009b4ae1f4b8f948010be53a73746)
 
-Eine kleine Gui, die PK-Tutoren während der Übungen unterstützen soll. Sie dient zum  efficienten Eintragen der Anwesenheit und der Adhocbewertungen. 
+Eine kleine Gui, die PK-Tutoren während der Übungen unterstützen soll. Sie dient zum  effizienten Eintragen der Anwesenheit und der Adhocbewertungen. 
 
 ![Screenshot](https://raw.githubusercontent.com/jakobkogler/pk-tool/master/screenshot.png)
 
