@@ -13,14 +13,14 @@ class GitDialog(QDialog, Ui_GitDialog):
     Dialog to add and commit files to the pk-repo.
     """
 
-    def __init__(self, repo):
+    def __init__(self, git_interactions):
         """
         Initialize everything. Show modified files.
         """
         QDialog.__init__(self)
         self.setupUi(self)
 
-        self.repo = repo
+        self.repo = git_interactions.repo
 
         self.list_widget.clear()
         self.list_widget.addItems(self.get_changed_or_untracked_files())

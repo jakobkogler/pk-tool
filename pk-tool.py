@@ -7,22 +7,20 @@ from ui.mainwindow import Ui_MainWindow
 from src.group_infos import GroupInfos
 from src.settings import Settings
 from dialog.settingsdialog import SettingsDialog
+from src.git_interactions import GitInteractions
 from dialog.gitdialog import GitDialog
-
-use_git = True
-try:
-    import git
-except ImportError:
-    use_git = False
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, use_git):
+    def __init__(self):
         QMainWindow.__init__(self)
         self.setupUi(self)
 
         self.group_infos = GroupInfos(repo_path='')
         self.csv_files = dict()
+
+        self.settings = Settings()
+        self.git_interactions = GitInteractions(self.settings, self.action_commit_and_push)
 
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
         self.group_combobox.currentIndexChanged.connect(self.populate_files)
@@ -37,46 +35,28 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
 
-        self.settings = Settings()
-        self.settings.use_git = self.settings.use_git and use_git
-
-        self.try_reading_repo()
-
-    def try_git_pull(self):
-        pk_repo_path = self.settings.repo_path
-        if pk_repo_path and self.settings.use_git:
-            try:
-                self.repo = git.Repo(pk_repo_path)
-                o = self.repo.remotes.origin
-                info = o.pull()[0]
-
-                if info.flags & (git.FetchInfo.ERROR | git.FetchInfo.REJECTED):
-                    self.settings.use_git = False
-            except:
-                self.settings.use_git = False
-            if not self.settings.use_git:
-                QMessageBox.about(self, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
-                                  'Git-Interaktionen wurden für diese Session ausgeschaltet.')
-
-        if self.settings.use_git:
-            self.action_commit_and_push.setEnabled(True)
-        else:
-            self.action_commit_and_push.setDisabled(True)
+        self.read_repo()
 
     def show_about(self):
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
 
     def open_settings(self):
-        """Opens the settings-dialog, which allows to define the path to the pk-repo and the username
+        """
+        Opens the settings-dialog, which allows to define the path to the pk-repo and the username.
         Updates everything after closing.
         """
         settings_dialog = SettingsDialog(self.settings)
         settings_dialog.exec_()
+        self.read_repo()
 
-        self.try_reading_repo()
+    def open_git_dialog(self):
+        if self.settings.use_git:
+            git_dialog = GitDialog(self.git_interactions)
+            git_dialog.exec_()
 
-    def try_reading_repo(self):
-        self.try_git_pull()
+
+    def read_repo(self):
+        self.git_interactions.git_pull()
         self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
         self.table_widget.connect(self.group_infos, self.action_undo, self.action_redo, self.get_csv_path, self.write_console)
 
@@ -227,14 +207,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.console.clear()
 
-    def open_git_dialog(self):
-        if self.settings.use_git:
-            git_dialog = GitDialog(self.repo)
-            git_dialog.exec_()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = PkToolMainWindow(use_git)
+    window = PkToolMainWindow()
     window.show()
     sys.exit(app.exec_())
