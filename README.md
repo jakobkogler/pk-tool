@@ -82,4 +82,4 @@ Zu finden ist dieser Befehl unter `Bearbeiten - Studenten-E-Mails`.
 
 ## Licence ##
 
-Copyright (C) 2015 Jakob Kogler, [MIT License](https://raw.githubusercontent.com/jakobkogler/pk-tool/master/LICENSE.txt)
+Copyright (C) 2015-2016 Jakob Kogler, [MIT License](https://raw.githubusercontent.com/jakobkogler/pk-tool/master/LICENSE.txt)
