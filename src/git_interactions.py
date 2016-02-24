@@ -27,16 +27,17 @@ class GitInteractions:
         """
         Try git pull. If error, set use-git in settings to False and print error-message.
         """
-        success = self.pull()
-        if not success:
-            self.settings.use_git = False
-            QMessageBox.about(None, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
-                              'Git-Interaktionen wurden für diese Session ausgeschaltet.')
-
         if self.settings.use_git:
-            self.action_commit_and_push.setEnabled(True)
-        else:
-            self.action_commit_and_push.setDisabled(True)
+            success = self.pull()
+            if not success:
+                self.settings.use_git = False
+                QMessageBox.about(None, 'Fehler', 'Es gab einen Fehler beim Pullen des Git-Repos. \n'
+                                  'Git-Interaktionen wurden für diese Session ausgeschaltet.')
+
+            if self.settings.use_git:
+                self.action_commit_and_push.setEnabled(True)
+            else:
+                self.action_commit_and_push.setDisabled(True)
 
     def pull(self):
         """
