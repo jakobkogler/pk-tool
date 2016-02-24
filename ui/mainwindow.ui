@@ -250,6 +250,7 @@
      <string>Too&amp;ls</string>
     </property>
     <addaction name="action_get_email"/>
+    <addaction name="action_diagram"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuBearbeiten"/>
@@ -297,6 +298,11 @@
   <action name="action_commit_and_push">
    <property name="text">
     <string>&amp;Commit und Push</string>
+   </property>
+  </action>
+  <action name="action_diagram">
+   <property name="text">
+    <string>Gruppen-Diagramm</string>
    </property>
   </action>
  </widget>

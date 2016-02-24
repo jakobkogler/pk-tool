@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui'
+# Form implementation generated from reading ui file 'ui/mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.5.1
 #
@@ -135,6 +135,8 @@ class Ui_MainWindow(object):
         self.action_get_email.setObjectName("action_get_email")
         self.action_commit_and_push = QtWidgets.QAction(MainWindow)
         self.action_commit_and_push.setObjectName("action_commit_and_push")
+        self.action_diagram = QtWidgets.QAction(MainWindow)
+        self.action_diagram.setObjectName("action_diagram")
         self.menuDatei.addAction(self.action_new)
         self.menuDatei.addAction(self.action_settings)
         self.menuDatei.addAction(self.action_commit_and_push)
@@ -143,6 +145,7 @@ class Ui_MainWindow(object):
         self.menuBearbeiten.addAction(self.action_add_student)
         self.menu.addAction(self.action_about)
         self.menuTools.addAction(self.action_get_email)
+        self.menuTools.addAction(self.action_diagram)
         self.menuBar.addAction(self.menuDatei.menuAction())
         self.menuBar.addAction(self.menuBearbeiten.menuAction())
         self.menuBar.addAction(self.menuTools.menuAction())
@@ -177,5 +180,6 @@ class Ui_MainWindow(object):
         self.action_about.setText(_translate("MainWindow", "&About"))
         self.action_get_email.setText(_translate("MainWindow", "&Kopiere E-Mails in die Zwischenablage"))
         self.action_commit_and_push.setText(_translate("MainWindow", "&Commit und Push"))
+        self.action_diagram.setText(_translate("MainWindow", "Gruppen-Diagramm"))
 
 from src.lessontable import LessonTable

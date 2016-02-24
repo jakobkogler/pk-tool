@@ -9,6 +9,7 @@ from src.settings import Settings
 from dialog.settingsdialog import SettingsDialog
 from src.git_interactions import GitInteractions
 from dialog.gitdialog import GitDialog
+from src.diagram import DiagramDialog
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
@@ -41,6 +42,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_settings.triggered.connect(self.open_settings)
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
+        self.action_diagram.triggered.connect(self.show_group_diagram)
 
         self.read_repo()
 
@@ -49,6 +51,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         Opens a messagebox that shows informations about this application.
         """
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
+
+    def show_group_diagram(self):
+        """
+        Show a diagram with group informations
+        """
+        dialog = DiagramDialog(files=self.csv_files.values())
+        dialog.exec_()
 
     def open_settings(self):
         """
