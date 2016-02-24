@@ -1,6 +1,3 @@
-from PyQt5 import QtCore
-
-
 class History:
     """
     Records every change in the table and undo/redo this actions on command.
