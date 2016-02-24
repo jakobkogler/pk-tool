@@ -12,7 +12,14 @@ from dialog.gitdialog import GitDialog
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
+    """
+    Application which allows to manage the csv-attendance-files from the pk-repo.
+    """
+
     def __init__(self):
+        """
+        Initialize everything. Connect signals and slots. Read repo.
+        """
         QMainWindow.__init__(self)
         self.setupUi(self)
 
@@ -38,6 +45,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.read_repo()
 
     def show_about(self):
+        """
+        Opens a messagebox that shows informations about this application.
+        """
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
 
     def open_settings(self):
@@ -50,15 +60,21 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.read_repo()
 
     def open_git_dialog(self):
+        """
+        Open a dialog for commiting files to git.
+        """
         if self.settings.use_git:
             git_dialog = GitDialog(self.git_interactions)
             git_dialog.exec_()
 
-
     def read_repo(self):
+        """
+        Read all important data from the pk-repo and fill all comboboxes accordingly
+        """
         self.git_interactions.git_pull()
         self.group_infos = GroupInfos(repo_path=self.settings.repo_path)
-        self.table_widget.connect(self.group_infos, self.action_undo, self.action_redo, self.get_csv_path, self.write_console)
+        self.table_widget.connect(self.group_infos, self.action_undo, self.action_redo,
+                                  self.get_csv_path, self.write_console)
 
         self.group_type_combobox.currentIndexChanged.disconnect()
 
@@ -69,11 +85,14 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.fill_group_names_combobox()
 
     def write_console(self, text):
+        """
+        Write a text to the console.
+        """
         self.console_output.setText(text)
 
     def fill_group_names_combobox(self):
-        """Populate the combobox with all the group names,
-        that apply for the group type specified in the form.
+        """
+        Populate the combobox with all the group names, that apply for the group type specified in the form.
         """
         type_index = self.group_type_combobox.currentIndex()
 
@@ -100,12 +119,16 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.populate_files()
 
     def new_student(self):
+        """
+        Adds a new student to the current table.
+        """
         matrikelnr, ok = QInputDialog.getText(self, 'Neuen Studenten hinzufügen', 'Matrikelnummer:')
         if ok and matrikelnr:
             self.table_widget.new_student(matrikelnr)
 
     def load_group_data(self):
-        """Load all data for a specific group.
+        """
+        Load all data for a specific group.
         It updates the names of the instructor and tutors and loads the last available csv-file for this group.
         """
         group_name = self.group_combobox.currentText()
@@ -123,6 +146,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             self.table_widget.load_csv_file(self.get_csv_path())
 
     def get_email(self):
+        """
+        Determine all email-adresses from the current group and push the into the clipboard.
+        """
         clipboard = QApplication.clipboard(self)
         group_name = self.group_combobox.currentText()
         group = self.group_infos.get_group_info(group_name)
@@ -130,11 +156,15 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         clipboard.setText(', '.join(emails))
 
     def get_csv_path(self):
-        """Returns the path to the csv-file
+        """
+        Returns the path to the current csv-file
         """
         return self.csv_files[self.file_combobox.currentText()]
 
     def new_csv(self):
+        """
+        Generate a new csv-file for this group.
+        """
         path_suggestion = '/Anwesenheiten/Uebungen/' + self.group_combobox.currentText() + '_ue' + \
                           str(len(self.file_combobox) + 1) + '.csv'
 
@@ -157,9 +187,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.file_combobox.setCurrentIndex(index)
 
     def populate_files(self):
-        """Finds the csv files for this group and populates the combobox
         """
-
+        Finds the csv files for this group and populates the combobox
+        """
         self.file_combobox.currentIndexChanged.disconnect()
 
         group_name = self.group_combobox.currentText()
@@ -177,7 +207,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.load_group_data()
 
     def execute_console(self):
-        """Executes a command from the console
+        """
+        Executes a command from the console
         'name a' checks the attendance
         'name b' unchecks the attendance
         'name number' writes the adhoc-points
