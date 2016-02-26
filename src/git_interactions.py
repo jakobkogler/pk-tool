@@ -38,6 +38,8 @@ class GitInteractions:
                 self.action_commit_and_push.setEnabled(True)
             else:
                 self.action_commit_and_push.setDisabled(True)
+        else:
+            self.action_commit_and_push.setDisabled(True)
 
     def pull(self):
         """
