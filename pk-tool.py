@@ -43,6 +43,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
         self.action_diagram.triggered.connect(self.show_group_diagram)
+        self.action_groups_comparison.triggered.connect(self.show_group_comparison)
 
         self.read_repo()
 
@@ -57,6 +58,16 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         Show a diagram with group informations
         """
         dialog = DiagramDialog(files=self.csv_files.values())
+        dialog.exec_()
+
+    def show_group_comparison(self):
+        """
+        Show group comparison
+        """
+        files = dict()
+        for group_name in self.group_infos.get_group_names():
+            files[group_name] = self.get_csv_files(group_name).values()
+        dialog = DiagramDialog(files=files)
         dialog.exec_()
 
     def open_settings(self):
@@ -202,11 +213,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.file_combobox.currentIndexChanged.disconnect()
 
         group_name = self.group_combobox.currentText()
-        path = self.settings.repo_path + '/Anwesenheiten/Uebungen/'
-        self.csv_files = {os.path.join(os.path.basename(root), name): os.path.join(root, name)
-                          for root, dirs, files in os.walk(path)
-                          for name in files
-                          if name.startswith(group_name)}
+        self.csv_files = self.get_csv_files(group_name)
 
         self.file_combobox.clear()
         self.file_combobox.addItems(sorted(self.csv_files.keys()))
@@ -214,6 +221,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
         self.load_group_data()
+
+    def get_csv_files(self, group_name):
+        path = self.settings.repo_path + '/Anwesenheiten/Uebungen/'
+        return {os.path.join(os.path.basename(root), name): os.path.join(root, name)
+                for root, dirs, files in os.walk(path)
+                for name in files
+                if name.startswith(group_name)}
 
     def execute_console(self):
         """
