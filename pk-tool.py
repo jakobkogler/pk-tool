@@ -46,6 +46,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_groups_comparison.triggered.connect(self.show_group_comparison)
 
         self.read_repo()
+        if not self.settings.repo_path:
+            self.open_settings()
 
     def show_about(self):
         """
