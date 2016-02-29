@@ -5,7 +5,14 @@ import re
 
 
 class DiagramDialog(QDialog):
+    """
+    Class for displaying diagrams.
+    """
+
     def __init__(self, parent=None, files=None):
+        """
+        Initialize the ui-elements and all either the plot or comparison method.
+        """
         super(DiagramDialog, self).__init__(parent)
 
         self.files = files
@@ -28,6 +35,9 @@ class DiagramDialog(QDialog):
             self.plot()
 
     def plot(self):
+        """
+        Displays a diagram showing the appendance of the current group.
+        """
         data, labels = self.parse_files(self.files)
 
         # create an axis
@@ -55,6 +65,10 @@ class DiagramDialog(QDialog):
         self.canvas.draw()
 
     def comparison(self):
+        """
+        Compare all groups compared by their appendance.
+        Displays a diagram.
+        """
         all_data = []
         all_labels = set()
 
@@ -91,6 +105,10 @@ class DiagramDialog(QDialog):
         self.canvas.draw()
 
     def parse_files(self, files):
+        """
+        Parse a list of files for their appendance-count.
+        Return a list of these counts and a list of the lesson-names.
+        """
         parsed = []
         for file in files:
             pattern = re.compile(r'ue\d+')
