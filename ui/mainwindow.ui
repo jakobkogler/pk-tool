@@ -250,8 +250,6 @@
      <string>Too&amp;ls</string>
     </property>
     <addaction name="action_get_email"/>
-    <addaction name="action_diagram"/>
-    <addaction name="action_groups_comparison"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuBearbeiten"/>
@@ -308,7 +306,7 @@
   </action>
   <action name="action_groups_comparison">
    <property name="text">
-    <string>Gruppen-Vergleich</string>
+    <string>Gruppen-&amp;Vergleich</string>
    </property>
   </action>
  </widget>

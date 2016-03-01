@@ -147,8 +147,6 @@ class Ui_MainWindow(object):
         self.menuBearbeiten.addAction(self.action_add_student)
         self.menu.addAction(self.action_about)
         self.menuTools.addAction(self.action_get_email)
-        self.menuTools.addAction(self.action_diagram)
-        self.menuTools.addAction(self.action_groups_comparison)
         self.menuBar.addAction(self.menuDatei.menuAction())
         self.menuBar.addAction(self.menuBearbeiten.menuAction())
         self.menuBar.addAction(self.menuTools.menuAction())
@@ -184,6 +182,6 @@ class Ui_MainWindow(object):
         self.action_get_email.setText(_translate("MainWindow", "&Kopiere E-Mails in die Zwischenablage"))
         self.action_commit_and_push.setText(_translate("MainWindow", "&Commit und Push"))
         self.action_diagram.setText(_translate("MainWindow", "&Gruppen-Diagramm"))
-        self.action_groups_comparison.setText(_translate("MainWindow", "Gruppen-Vergleich"))
+        self.action_groups_comparison.setText(_translate("MainWindow", "Gruppen-&Vergleich"))
 
 from src.lessontable import LessonTable

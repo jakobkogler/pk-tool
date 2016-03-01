@@ -9,7 +9,6 @@ from src.settings import Settings
 from dialog.settingsdialog import SettingsDialog
 from src.git_interactions import GitInteractions
 from dialog.gitdialog import GitDialog
-from src.diagram import DiagramDialog
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
@@ -42,8 +41,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_settings.triggered.connect(self.open_settings)
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
-        self.action_diagram.triggered.connect(self.show_group_diagram)
-        self.action_groups_comparison.triggered.connect(self.show_group_comparison)
 
         self.read_repo()
         if not self.settings.repo_path:
@@ -54,23 +51,6 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         Opens a messagebox that shows informations about this application.
         """
         QMessageBox.about(self, 'About', 'https://github.com/jakobkogler/pk-tool')
-
-    def show_group_diagram(self):
-        """
-        Show a diagram with group informations
-        """
-        dialog = DiagramDialog(files=self.csv_files.values())
-        dialog.exec_()
-
-    def show_group_comparison(self):
-        """
-        Show group comparison
-        """
-        files = dict()
-        for group_name in self.group_infos.get_group_names():
-            files[group_name] = self.get_csv_files(group_name).values()
-        dialog = DiagramDialog(files=files)
-        dialog.exec_()
 
     def open_settings(self):
         """
