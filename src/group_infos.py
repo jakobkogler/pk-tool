@@ -14,9 +14,7 @@ class GroupInfos:
     """
 
     def __init__(self, repo_path=''):
-        """
-        Initializes the instance. Reads and parses all the infos from files in the pk repo.
-        """
+        """Initializes the instance. Reads and parses all the infos from files in the pk repo."""
         self.repo_path = repo_path
         self.groups = dict()
 
@@ -24,26 +22,20 @@ class GroupInfos:
         self.__read_student_lists()
 
     def tutor_names(self):
-        """
-        Returns a list of the names of all tutors
-        """
+        """Returns a list of the names of all tutors"""
         groups = [[group.tutor1, group.tutor2] for group in self.groups.values()]
         names = set(name for group in groups for name in group)
         names.add('')
         return sorted(names)
 
     def get_group_info(self, group_name):
-        """
-        Returns the info for a specific group
-        """
+        """Returns the info for a specific group"""
         if group_name not in self.groups:
             self.groups[group_name] = Group(group_name)
         return self.groups[group_name]
 
     def get_involved_groups(self, tutor_name):
-        """
-        Returns a list of names of all groups a tutor is involved in
-        """
+        """Returns a list of names of all groups a tutor is involved in"""
         return [name for name, info in self.groups.items() if tutor_name in [info.tutor1, info.tutor2]]
 
     def get_group_names(self, allowed_types=None):
@@ -58,21 +50,17 @@ class GroupInfos:
             return [name for name, group in self.groups.items() if group.group_type in allowed_types]
 
     def get_student(self, matrikelnr):
-        """
-        Finds the student object for a given matrikelnr
-        """
+        """Finds the student object for a given matrikelnr"""
         for group in self.groups.values():
             for student in group.students:
                 if student.matrikelnr == matrikelnr:
                     return student
-        else:
-            return Student('Abgemeldet', matrikelnr, '', '')
+
+        return Student('Abgemeldet', matrikelnr, '', '')
 
     @staticmethod
     def __split_file_into_parts(filename, regex):
-        """
-        Splits the lines of a file into parts. It starts a new part if the line matches a regex.
-        """
+        """Splits the lines of a file into parts. It starts a new part if the line matches a regex."""
         file_parts = []
 
         try:
