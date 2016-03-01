@@ -1,0 +1,10 @@
+doc-warnings: yes
+test-warnings: no
+strictness: high
+max-line-length: 100
+autodetect: yes
+ignore-paths:
+    - ui
+python-targets:
+    - 3
+
