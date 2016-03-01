@@ -110,8 +110,8 @@ class GroupInfos:
         and extracts all groups and student data.
         """
         path_template = self.repo_path + '/Anwesenheiten/Anmeldung/groups_{group_type}.txt'
-        group_name_regex = re.compile('(mo|di|mi|do|fr)\d{2}\w')
-        student_regex = re.compile('\s+[+✔]\s+(\D+)\s(\d+)\s(.*)\s?')
+        group_name_regex = re.compile(r'(mo|di|mi|do|fr)\d{2}\w')
+        student_regex = re.compile(r'\s+[+✔]\s+(\D+)\s(\d+)\s(.*)\s?')
 
         for group_type in ['fortgeschritten', 'normal']:
             path = path_template.format(group_type=group_type)

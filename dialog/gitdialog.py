@@ -34,7 +34,7 @@ class GitDialog(QDialog, Ui_GitDialog):
         if success:
             files = [item.text() for item in self.list_widget.selectedItems()]
             for file in files:
-                pattern = re.compile('(\w\w\d\d\w)_ue')
+                pattern = re.compile(r'(\w\w\d\d\w)_ue')
                 matches = pattern.search(file)
                 group_name = ''
                 if matches:
