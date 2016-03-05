@@ -207,7 +207,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
     def get_csv_files(self, group_name):
         path = self.settings.repo_path + '/Anwesenheiten/Uebungen/'
-        return {os.path.join(os.path.basename(root), name): os.path.join(root, name)
+        return {os.path.basename(root): os.path.join(root, name)
                 for root, dirs, files in os.walk(path)
                 for name in files
                 if name.startswith(group_name)
