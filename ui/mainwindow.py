@@ -139,9 +139,12 @@ class Ui_MainWindow(object):
         self.action_diagram.setObjectName("action_diagram")
         self.action_groups_comparison = QtWidgets.QAction(MainWindow)
         self.action_groups_comparison.setObjectName("action_groups_comparison")
+        self.action_test_mode = QtWidgets.QAction(MainWindow)
+        self.action_test_mode.setObjectName("action_test_mode")
         self.menuDatei.addAction(self.action_new)
         self.menuDatei.addAction(self.action_settings)
         self.menuDatei.addAction(self.action_commit_and_push)
+        self.menuDatei.addAction(self.action_test_mode)
         self.menuBearbeiten.addAction(self.action_undo)
         self.menuBearbeiten.addAction(self.action_redo)
         self.menuBearbeiten.addAction(self.action_add_student)
@@ -183,5 +186,6 @@ class Ui_MainWindow(object):
         self.action_commit_and_push.setText(_translate("MainWindow", "&Commit und Push"))
         self.action_diagram.setText(_translate("MainWindow", "&Gruppen-Diagramm"))
         self.action_groups_comparison.setText(_translate("MainWindow", "Gruppen-&Vergleich"))
+        self.action_test_mode.setText(_translate("MainWindow", "Test-Modus"))
 
 from src.lessontable import LessonTable

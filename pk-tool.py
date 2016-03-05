@@ -9,6 +9,7 @@ from src.settings import Settings
 from dialog.settingsdialog import SettingsDialog
 from src.git_interactions import GitInteractions
 from dialog.gitdialog import GitDialog
+from dialog.load_test_dialog import LoadTestDialog
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
@@ -41,6 +42,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_settings.triggered.connect(self.open_settings)
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
+        self.action_test_mode.triggered.connect(self.open_load_test_mode)
 
         self.read_repo()
         if not self.settings.repo_path:
@@ -68,6 +70,13 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if self.settings.use_git:
             git_dialog = GitDialog(self.git_interactions)
             git_dialog.exec_()
+
+    def open_load_test_mode(self):
+        """
+        Opens a dialog that allows to load a registration file for a test and loads the test attendance csv-files.
+        """
+        load_test_mode_dialog = LoadTestDialog(self.settings)
+        load_test_mode_dialog.exec_()
 
     def read_repo(self):
         """

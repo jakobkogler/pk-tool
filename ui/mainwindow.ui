@@ -230,6 +230,7 @@
     <addaction name="action_new"/>
     <addaction name="action_settings"/>
     <addaction name="action_commit_and_push"/>
+    <addaction name="action_test_mode"/>
    </widget>
    <widget class="QMenu" name="menuBearbeiten">
     <property name="title">
@@ -307,6 +308,11 @@
   <action name="action_groups_comparison">
    <property name="text">
     <string>Gruppen-&amp;Vergleich</string>
+   </property>
+  </action>
+  <action name="action_test_mode">
+   <property name="text">
+    <string>Test-Modus</string>
    </property>
   </action>
  </widget>

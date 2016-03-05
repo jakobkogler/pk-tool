@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>LoadTestDialog</class>
+ <widget class="QDialog" name="LoadTestDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>593</width>
+    <height>226</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Test-Modus</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="line_edit_application_file"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_application_file">
+     <property name="text">
+      <string>Pfad zur Anmeldungsliste: </string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_folder_path">
+     <property name="text">
+      <string>Pfad zum Ordner des Tests:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="line_edit_folder_path"/>
+   </item>
+   <item row="3" column="2">
+    <widget class="QPushButton" name="button_folder_path">
+     <property name="text">
+      <string>Auswählen</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QLabel" name="label_description">
+     <property name="text">
+      <string>Zum Bearbeiten der Anwesenheit benötigt das Programm eine aktuelle Anmeldungsliste. Diese kann unter TUWEL - Kurs Programmkonstruktion - Anmeldung zu Test X - Teilnehmer als &quot;.txt&quot;-Datei heruntergeladen werden. 
+Ebenfalls wird der Pfad zum Ordner benötigt, in dem alle Anwesenheitslisten gespeichert werden sollen. </string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPushButton" name="button_application_file">
+     <property name="text">
+      <string>Auswählen</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Wechsle zum Test-Modus</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
