@@ -209,7 +209,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         return {os.path.join(os.path.basename(root), name): os.path.join(root, name)
                 for root, dirs, files in os.walk(path)
                 for name in files
-                if name.startswith(group_name)}
+                if name.startswith(group_name)
+                if name != 'placeholder'}
 
     def execute_console(self):
         """
