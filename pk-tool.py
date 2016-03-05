@@ -111,14 +111,15 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 allowed_types = ['fortgeschritten']
             group_names = self.group_infos.get_group_names(allowed_types=allowed_types)
 
-        self.group_combobox.currentIndexChanged.disconnect()
+        if group_names:
+            self.group_combobox.currentIndexChanged.disconnect()
 
-        self.group_combobox.clear()
-        group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]), name[2:]))
-        self.group_combobox.addItems(group_names)
+            self.group_combobox.clear()
+            group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]), name[2:]))
+            self.group_combobox.addItems(group_names)
 
-        self.group_combobox.currentIndexChanged.connect(self.populate_files)
-        self.populate_files()
+            self.group_combobox.currentIndexChanged.connect(self.populate_files)
+            self.populate_files()
 
     def new_student(self):
         """
