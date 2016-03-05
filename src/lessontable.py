@@ -131,28 +131,31 @@ class LessonTable(QTableWidget):
         self.setSortingEnabled(False)
         self.react_lock = True
 
-        with open(path, 'r', encoding='utf-8') as file:
-            next(file)  # skip header
-            for line in file:
-                matrikelnr, group_name, attendance, comment = line.strip().split(';')
-                adhoc, *comment = comment.split()
-                adhoc = adhoc.strip('%')
-                if adhoc == '0':
-                    adhoc = ''
-                comment = ' '.join(comment)
+        try:
+            with open(path, 'r', encoding='utf-8') as file:
+                next(file)  # skip header
+                for line in file:
+                    matrikelnr, group_name, attendance, comment = line.strip().split(';')
+                    adhoc, *comment = comment.split()
+                    adhoc = adhoc.strip('%')
+                    if adhoc == '0':
+                        adhoc = ''
+                    comment = ' '.join(comment)
 
-                idx = self.index_of_student(matrikelnr)
-                if idx < 0:
-                    idx = self.rowCount()
-                    new_student = self.group_infos.get_student(matrikelnr)
-                    self.add_row_to_table(new_student)
+                    idx = self.index_of_student(matrikelnr)
+                    if idx < 0:
+                        idx = self.rowCount()
+                        new_student = self.group_infos.get_student(matrikelnr)
+                        self.add_row_to_table(new_student)
 
-                self.item(idx, 1).setText(matrikelnr)
-                self.item(idx, 2).setText(group_name)
-                self.get_checkbox(idx).setCheckState(QtCore.Qt.Checked if attendance == 'an' else
-                                                     QtCore.Qt.Unchecked)
-                self.item(idx, 4).setText(adhoc)
-                self.item(idx, 5).setText(comment)
+                    self.item(idx, 1).setText(matrikelnr)
+                    self.item(idx, 2).setText(group_name)
+                    self.get_checkbox(idx).setCheckState(QtCore.Qt.Checked if attendance == 'an' else
+                                                         QtCore.Qt.Unchecked)
+                    self.item(idx, 4).setText(adhoc)
+                    self.item(idx, 5).setText(comment)
+        except FileNotFoundError:
+            pass
 
         self.resizeColumnsToContents()
         self.setSortingEnabled(True)
