@@ -4,8 +4,7 @@ class Group:
     and all the names, register-numbers and e-mails from students.
     """
 
-    def __init__(self, name, group_type='', instructor='', tutor1='', tutor2='',
-                 substitute1='', substitute2='', students=None):
+    def __init__(self, name, group_type='', instructor='', tutor1='', tutor2='', substitute='', students=None):
         """
         Initializes a group
         """
@@ -14,8 +13,7 @@ class Group:
         self.instructor = instructor
         self.tutor1 = tutor1
         self.tutor2 = tutor2
-        self.substitute1 = substitute1
-        self.substitute2 = substitute2
+        self.substitute = substitute
         self.students = students if students else []
 
     def add_student(self, student):

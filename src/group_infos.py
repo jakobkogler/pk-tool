@@ -93,7 +93,7 @@ class GroupInfos:
 
             info = dict()
             for line in part[1:]:
-                for title in 'leiter tutor1 tutor2 ersatz1 ersatz2'.split():
+                for title in 'leiter tutor1 tutor2 ersatz'.split():
                     if line.startswith(title) and '=' in line:
                         info[title] = line.split('=')[-1].strip()
 
@@ -101,8 +101,7 @@ class GroupInfos:
                                             instructor=info.get('leiter', ''),
                                             tutor1=info.get('tutor1', ''),
                                             tutor2=info.get('tutor2', ''),
-                                            substitute1=info.get('ersatz1', ''),
-                                            substitute2=info.get('ersatz2', ''))
+                                            substitute=info.get('ersatz', ''))
 
     def __read_student_lists(self):
         """
