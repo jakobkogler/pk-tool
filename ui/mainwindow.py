@@ -161,7 +161,7 @@ class Ui_MainWindow(object):
         self.groupBox_2.setTitle(_translate("MainWindow", "Gruppenauswahl:"))
         self.label_group_type.setText(_translate("MainWindow", "Gruppentype:"))
         self.label_group.setText(_translate("MainWindow", "Gruppe:"))
-        self.label_file.setText(_translate("MainWindow", "Datei:"))
+        self.label_file.setText(_translate("MainWindow", "Übung:"))
         self.groupBox.setTitle(_translate("MainWindow", "Gruppen-Info:"))
         self.label_instructor.setText(_translate("MainWindow", "Übungsleiter:"))
         self.label_tutor1.setText(_translate("MainWindow", "Tutor 1:"))
