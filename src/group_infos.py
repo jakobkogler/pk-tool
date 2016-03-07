@@ -56,7 +56,7 @@ class GroupInfos:
                 if student.matrikelnr == matrikelnr:
                     return student
 
-        return Student('Abgemeldet', matrikelnr, '', '')
+        return Student('', matrikelnr, '', '')
 
     @staticmethod
     def split_file_into_parts(filename, regex):

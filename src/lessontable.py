@@ -152,6 +152,10 @@ class LessonTable(QTableWidget):
                     if idx < 0:
                         idx = self.rowCount()
                         new_student = self.group_infos.get_student(matrikelnr)
+                        if test_file:
+                            new_student = Student(new_student.name, new_student.matrikelnr, new_student.email,
+                                                  self.group.name)
+
                         self.add_row_to_table(new_student)
 
                     self.item(idx, 1).setText(matrikelnr)
@@ -178,6 +182,9 @@ class LessonTable(QTableWidget):
         self.setSortingEnabled(False)
 
         student = self.group_infos.get_student(matrikelnr)
+        if self.test_file:
+            student = Student(student.name, student.matrikelnr, student.email, self.group.name)
+
         self.add_row_to_table(student)
         text = '{} hinzugefügt'.format(student.name)
         self.history.add_change((matrikelnr, text, 1, None, student))
