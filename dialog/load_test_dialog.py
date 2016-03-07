@@ -37,7 +37,7 @@ class LoadTestDialog(QDialog, Ui_LoadTestDialog):
         self.line_edit_application_file.setText(path)
 
         for idx, folder in enumerate(self.test_folders):
-            if folder in path:
+            if folder.lower() in ''.join(c for c in path.lower() if c != ' '):
                 self.folder_combobox.setCurrentIndex(idx)
                 break
 
