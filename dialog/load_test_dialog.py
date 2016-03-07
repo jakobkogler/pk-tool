@@ -1,5 +1,6 @@
 import os
 import re
+import io
 from PyQt5.QtWidgets import QDialog, QFileDialog
 from ui.load_test_dialog import Ui_LoadTestDialog
 from src.settings import Settings
@@ -63,5 +64,50 @@ class LoadTestDialog(QDialog, Ui_LoadTestDialog):
         self.list_groups.addItems(group_names)
 
     def load_test_slots(self):
-        self.selected_groups = [self.groups[idx] for idx in self.list_groups.selectedIndexes()]
+        self.selected_groups = [self.groups[idx.row()] for idx in self.list_groups.selectedIndexes()]
+
+        for group in self.selected_groups:
+            group_name = group.name
+            group_name = ''.join(c for c in group_name.lower() if 'a' <= c <= 'z')
+            time_regex = re.compile(r'(\d\d):\d\d')
+            match = time_regex.search(group.name)
+            if match:
+                group_name += match.group(1)
+
+            path = '{repo}/Anwesenheiten/Tests/{folder}/{group_name}.csv'.format(repo=self.settings.repo_path,
+                                                                                 folder=self.folder_combobox.currentText(),
+                                                                                 group_name=group_name)
+            data = self.load_file(path)
+
+            for student in group.students:
+                for entry in data:
+                    if entry[0] == student.matrikelnr:
+                        break
+                else:
+                    data.append((student.matrikelnr, group_name, 'ab', ''))
+
+            self.export_csv(path, data)
+
         self.close()
+
+    def load_file(self, path):
+        data = []
+        try:
+            with open(path, 'r', encoding='utf-8') as file:
+                next(file)  # skip header
+                for line in file:
+                    matrikelnr, group_name, attendance, comment = line.strip().split(';')
+                    data.append((matrikelnr, group_name, attendance, comment))
+        except FileNotFoundError:
+            pass
+
+        return data
+
+    def export_csv(self, path, data):
+        """
+        Write the opened table to a csv-file
+        """
+        with io.open(path, 'w', encoding='utf-8', newline='') as f:
+            f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
+            for d in data:
+                f.write('{};{};{};{}\n'.format(*d))
