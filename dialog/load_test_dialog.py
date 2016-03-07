@@ -44,7 +44,7 @@ class LoadTestDialog(QDialog, Ui_LoadTestDialog):
     def load_groups(self):
         path = self.line_edit_application_file.text()
 
-        test_name_regex = re.compile(r'[\w\s]+\s\d\d:\d\d')
+        test_name_regex = re.compile(r'.+\s\d\d:\d\d')
         student_regex = re.compile(r'\s+[+✔]\s+(\D+)\s(\d+)\s(.*)\s?')
 
         self.groups = []
