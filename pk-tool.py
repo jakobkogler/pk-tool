@@ -120,13 +120,22 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 allowed_types = ['fortgeschritten']
             group_names = self.group_infos.get_group_names(allowed_types=allowed_types)
         else:
-            group_names = []
+            path_to_folders = '{}/Anwesenheiten/Tests/'.format(self.settings.repo_path)
+            group_names = sorted(os.listdir(path_to_folders))
 
         if group_names:
             self.group_combobox.currentIndexChanged.disconnect()
 
             self.group_combobox.clear()
-            group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]), name[2:]))
+            if type_index < 4:
+                group_names.sort(key=lambda name: ('mo di mi do fr'.split().index(name[:2]), name[2:]))
+                self.label_group.setText('Gruppe:')
+                self.label_file.setText('Übung:')
+            else:
+                group_names.sort()
+                self.label_group.setText('Testnummer:')
+                self.label_file.setText('Slot:')
+
             self.group_combobox.addItems(group_names)
 
             self.group_combobox.currentIndexChanged.connect(self.populate_files)
