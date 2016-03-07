@@ -79,6 +79,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         load_test_mode_dialog.exec_()
         for group in load_test_mode_dialog.selected_groups:
             self.table_widget.group_infos.groups[group.name] = group
+        self.group_type_combobox.setCurrentIndex(4)
+        self.group_type_combobox.setDisabled(True)
 
     def read_repo(self):
         """
