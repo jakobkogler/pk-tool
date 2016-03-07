@@ -166,7 +166,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         group = self.group_infos.get_group_info(group_name)
         self.table_widget.setup_table(group)
         if self.file_combobox.count():
-            self.table_widget.load_csv_file(self.get_csv_path())
+            self.table_widget.load_csv_file(self.get_csv_path(), self.group_type_combobox.currentIndex() == 4)
 
     def get_email(self):
         """
@@ -215,15 +215,29 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         self.file_combobox.currentIndexChanged.disconnect()
 
-        group_name = self.group_combobox.currentText()
-        self.csv_files = self.get_csv_files(group_name)
+        if (self.group_type_combobox.currentIndex() < 4):
+            group_name = self.group_combobox.currentText()
+            self.csv_files = self.get_csv_files(group_name)
 
-        self.file_combobox.clear()
-        self.file_combobox.addItems(sorted(self.csv_files.keys()))
-        self.file_combobox.setCurrentIndex(self.file_combobox.count() - 1)
+            self.file_combobox.clear()
+            self.file_combobox.addItems(sorted(self.csv_files.keys()))
+            self.file_combobox.setCurrentIndex(self.file_combobox.count() - 1)
+        else:
+            test_folder = self.group_combobox.currentText()
+            self.csv_files = self.get_test_files(test_folder)
+            self.file_combobox.clear()
+            self.file_combobox.addItems(sorted(self.csv_files.keys()))
+            self.file_combobox.setCurrentIndex(0)
 
         self.file_combobox.currentIndexChanged.connect(self.load_group_data)
         self.load_group_data()
+
+    def get_test_files(self, test_folder):
+        path = self.settings.repo_path + '/Anwesenheiten/Tests/' + test_folder + '/'
+        return {name.rstrip('.csv'): os.path.join(root, name)
+                for root, dirs, files in os.walk(path)
+                for name in files
+                if name.endswith('.csv')}
 
     def get_csv_files(self, group_name):
         path = self.settings.repo_path + '/Anwesenheiten/Uebungen/'

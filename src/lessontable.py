@@ -29,6 +29,7 @@ class LessonTable(QTableWidget):
         self.get_csv_path = None
         self.group = None
         self.write_console = None
+        self.test_file = False
 
         self.cellChanged.connect(self.react_to_change)
 
@@ -124,23 +125,28 @@ class LessonTable(QTableWidget):
         """
         return self.cellWidget(index, 3).layout().itemAt(0).widget()
 
-    def load_csv_file(self, path):
+    def load_csv_file(self, path, test_file=False):
         """
         Load a lesson-csv-file and update the table with it's data
         """
         self.setSortingEnabled(False)
         self.react_lock = True
 
+        self.test_file = test_file
+
         try:
             with open(path, 'r', encoding='utf-8') as file:
                 next(file)  # skip header
                 for line in file:
                     matrikelnr, group_name, attendance, comment = line.strip().split(';')
-                    adhoc, *comment = comment.split()
-                    adhoc = adhoc.strip('%')
-                    if adhoc == '0':
+                    if not test_file:
+                        adhoc, *comment = comment.split()
+                        adhoc = adhoc.strip('%')
+                        if adhoc == '0':
+                            adhoc = ''
+                        comment = ' '.join(comment)
+                    else:
                         adhoc = ''
-                    comment = ' '.join(comment)
 
                     idx = self.index_of_student(matrikelnr)
                     if idx < 0:
@@ -198,7 +204,10 @@ class LessonTable(QTableWidget):
             data = self.get_current_data()
             data.sort(key=lambda t: order.get(t[0], 999))
             for d in data:
-                f.write('{};{};{};{}% {}\n'.format(*d))
+                if self.test_file:
+                    f.write('{};{};{};{}\n'.format(d[0], d[1], d[2], d[4]))
+                else:
+                    f.write('{};{};{};{}% {}\n'.format(*d))
 
     def index_of_student(self, identification):
         """
