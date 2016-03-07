@@ -88,6 +88,7 @@ class LoadTestDialog(QDialog, Ui_LoadTestDialog):
 
             self.export_csv(path, data)
 
+        self.accept()
         self.close()
 
     def load_file(self, path):

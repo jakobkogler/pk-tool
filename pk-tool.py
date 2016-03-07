@@ -76,11 +76,12 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         Opens a dialog that allows to load a registration file for a test and loads the test attendance csv-files.
         """
         load_test_mode_dialog = LoadTestDialog(self.settings)
-        load_test_mode_dialog.exec_()
-        for group in load_test_mode_dialog.selected_groups:
-            self.table_widget.group_infos.groups[group.name] = group
-        self.group_type_combobox.setCurrentIndex(4)
-        self.group_type_combobox.setDisabled(True)
+        if load_test_mode_dialog.exec_():
+            for group in load_test_mode_dialog.selected_groups:
+                self.table_widget.group_infos.groups[group.name] = group
+            self.group_type_combobox.setCurrentIndex(4)
+            self.group_type_combobox.setDisabled(True)
+            self.populate_files()
 
     def read_repo(self):
         """
