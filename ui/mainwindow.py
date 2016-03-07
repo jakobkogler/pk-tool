@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ui/mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.5.1
 #
@@ -139,12 +139,12 @@ class Ui_MainWindow(object):
         self.action_diagram.setObjectName("action_diagram")
         self.action_groups_comparison = QtWidgets.QAction(MainWindow)
         self.action_groups_comparison.setObjectName("action_groups_comparison")
-        self.action_test_mode = QtWidgets.QAction(MainWindow)
-        self.action_test_mode.setObjectName("action_test_mode")
+        self.action_load_test_applications = QtWidgets.QAction(MainWindow)
+        self.action_load_test_applications.setObjectName("action_load_test_applications")
         self.menuDatei.addAction(self.action_new)
         self.menuDatei.addAction(self.action_settings)
         self.menuDatei.addAction(self.action_commit_and_push)
-        self.menuDatei.addAction(self.action_test_mode)
+        self.menuDatei.addAction(self.action_load_test_applications)
         self.menuBearbeiten.addAction(self.action_undo)
         self.menuBearbeiten.addAction(self.action_redo)
         self.menuBearbeiten.addAction(self.action_add_student)
@@ -186,6 +186,7 @@ class Ui_MainWindow(object):
         self.action_commit_and_push.setText(_translate("MainWindow", "&Commit und Push"))
         self.action_diagram.setText(_translate("MainWindow", "&Gruppen-Diagramm"))
         self.action_groups_comparison.setText(_translate("MainWindow", "Gruppen-&Vergleich"))
-        self.action_test_mode.setText(_translate("MainWindow", "Test-Modus"))
+        self.action_load_test_applications.setText(_translate("MainWindow", "Lade Test-Anmeldungen"))
+        self.action_load_test_applications.setToolTip(_translate("MainWindow", "Lade Test-Anmeldungen"))
 
 from src.lessontable import LessonTable

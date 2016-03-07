@@ -42,7 +42,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.action_settings.triggered.connect(self.open_settings)
         self.action_get_email.triggered.connect(self.get_email)
         self.action_commit_and_push.triggered.connect(self.open_git_dialog)
-        self.action_test_mode.triggered.connect(self.open_load_test_mode)
+        self.action_load_test_applications.triggered.connect(self.open_load_test_mode)
 
         self.read_repo()
         if not self.settings.repo_path:
@@ -90,7 +90,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.group_type_combobox.currentIndexChanged.disconnect()
 
         self.group_type_combobox.clear()
-        self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten'.split())
+        self.group_type_combobox.addItems('Meine Alle Normal Fortgeschritten Tests'.split())
 
         self.group_type_combobox.currentIndexChanged.connect(self.fill_group_names_combobox)
         self.fill_group_names_combobox()
@@ -110,7 +110,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if type_index == 0:
             tutor_name = self.settings.username
             group_names = self.group_infos.get_involved_groups(tutor_name)
-        else:
+        elif type_index < 4:
             allowed_types = []
             if type_index == 1:
                 allowed_types = ['normal', 'fortgeschritten']
@@ -119,6 +119,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             elif type_index == 3:
                 allowed_types = ['fortgeschritten']
             group_names = self.group_infos.get_group_names(allowed_types=allowed_types)
+        else:
+            group_names = []
 
         if group_names:
             self.group_combobox.currentIndexChanged.disconnect()

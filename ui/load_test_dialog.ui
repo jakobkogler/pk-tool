@@ -7,13 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>593</width>
-    <height>226</height>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Laden der Anmeldungsliste für einen Test</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="5" column="0" colspan="3">
+    <widget class="QListWidget" name="list_groups">
+     <property name="selectionMode">
+      <enum>QAbstractItemView::MultiSelection</enum>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="1">
     <widget class="QComboBox" name="folder_combobox">
      <property name="layoutDirection">
@@ -45,6 +52,13 @@
      </property>
     </widget>
    </item>
+   <item row="6" column="0" colspan="3">
+    <widget class="QPushButton" name="button_load_test_slots">
+     <property name="text">
+      <string>Lade die ausgewählten Slots</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0" colspan="3">
     <widget class="QLabel" name="label_description">
      <property name="text">
@@ -57,9 +71,13 @@ Ebenfalls wird der Testname (Testnummer) benötigt. </string>
     </widget>
    </item>
    <item row="4" column="0" colspan="3">
-    <widget class="QPushButton" name="button_load_application_list">
+    <widget class="QLabel" name="label_load_explanation">
      <property name="text">
-      <string>Lade die Anmeldungsliste</string>
+      <string>Wählen Sie die Testslots aus, die Sie laden möchten. Von diesen werden sofort csv-Dateien erstellt, die Sie danach mit diesem Programm bearbeiten können. 
+Falls außer ihnen auch noch andere Personen die Anwesenheit der Studenten kontroliert, sollten Sie nur ihre Testslots laden. Oder zumindest die erstellten csv-Dateien nach dem Erstellen sofort mit Git commiten und pushen. </string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

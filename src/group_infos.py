@@ -59,7 +59,7 @@ class GroupInfos:
         return Student('Abgemeldet', matrikelnr, '', '')
 
     @staticmethod
-    def __split_file_into_parts(filename, regex):
+    def split_file_into_parts(filename, regex):
         """Splits the lines of a file into parts. It starts a new part if the line matches a regex."""
         file_parts = []
 
@@ -84,7 +84,7 @@ class GroupInfos:
         name_regex = re.compile(r'\[((mo|di|mi|do|fr)\d{2}\w)\]')
         name_simple_regex = re.compile(r'\[.*\]')
 
-        for part in self.__split_file_into_parts(path, name_simple_regex):
+        for part in self.split_file_into_parts(path, name_simple_regex):
             match = name_regex.search(part[0])
             if match:
                 group_name = match.group(1)
@@ -114,7 +114,7 @@ class GroupInfos:
 
         for group_type in ['fortgeschritten', 'normal']:
             path = path_template.format(group_type=group_type)
-            for part in self.__split_file_into_parts(path, group_name_regex):
+            for part in self.split_file_into_parts(path, group_name_regex):
                 group_name = group_name_regex.search(part[0]).group(0)
                 group = self.get_group_info(group_name)
                 group.group_type = group_type
