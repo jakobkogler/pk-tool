@@ -8,7 +8,15 @@ Eine kleine Gui, die PK-Tutoren während der Übungen unterstützen soll. Sie di
 
 ## Download
 
-Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.3/pk-tool.exe)
+Achtung: Bei diesen vorkompilierten Versionen funktionieren möglicherweise nicht alle Funktionen. 
+Die Git-Interaktionen funktionieren mit meinem Windows nicht (eventuell aber nur bei mir). 
+Und außerdem ist das Design des Programmes mit den vorkompilierten Versionen relativ hässlich.
+
+Es wird also geraten, dass man Python und PyQt installiert (siehe Voraussetzungen) und das Programm damit ausführt. 
+Ansonsten:
+
+Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.4/pk-tool.exe)
+Kompilierte Version für Linux (kompiliert unter Manjaro 15.12) [pk-tool](https://github.com/jakobkogler/pk-tool/releases/download/0.4/pk-tool)
 
 ## Voraussetzungen ##
 
