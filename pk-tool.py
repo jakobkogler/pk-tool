@@ -81,9 +81,11 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             for group in load_test_mode_dialog.selected_groups:
                 self.table_widget.group_infos.groups[group.name] = group
             self.group_type_combobox.setCurrentIndex(4)
-            self.group_type_combobox.setDisabled(True)
-            self.action_new.setDisabled(True)
             self.populate_files()
+
+    def test_mode(self):
+        self.group_type_combobox.setDisabled(True)
+        self.action_new.setDisabled(True)
 
     def read_repo(self):
         """
@@ -129,6 +131,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         else:
             path_to_folders = '{}/Anwesenheiten/Tests/'.format(self.settings.repo_path)
             group_names = sorted(os.listdir(path_to_folders))
+            self.test_mode()
 
         if group_names:
             self.group_combobox.currentIndexChanged.disconnect()
