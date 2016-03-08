@@ -188,6 +188,7 @@ class LessonTable(QTableWidget):
         self.add_row_to_table(student)
         text = '{} hinzugefügt'.format(student.name)
         self.history.add_change((matrikelnr, text, 1, None, student))
+        self.export_csv()
 
         self.setSortingEnabled(True)
         self.react_lock = False
