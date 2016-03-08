@@ -80,6 +80,10 @@ Man kann außerdem eine Liste der E-Mails aller Stundenten einer Gruppe generier
 Diese Liste wird automatisch in die Zwischenablage gelegt und kann anschließend mit `Strg-V` in ein Mail-Programm eingefügt werden. 
 Zu finden ist dieser Befehl unter `Tools - Studenten-E-Mails`. 
 
+### Test-Modus
+
+Mit einem Klick auf `Datei - Lade Test-Anmeldungen` kann man die Anmeldungsliste von Tuwel laden und automatisch die csv-Dateien für die Test-Anwesenheit generieren. 
+
 ## Licence ##
 
 Copyright (C) 2015-2016 Jakob Kogler, [MIT License](https://raw.githubusercontent.com/jakobkogler/pk-tool/master/LICENSE.txt)
