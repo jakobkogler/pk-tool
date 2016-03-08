@@ -10,6 +10,7 @@ from dialog.settingsdialog import SettingsDialog
 from src.git_interactions import GitInteractions
 from dialog.gitdialog import GitDialog
 from dialog.load_test_dialog import LoadTestDialog
+from src.group import Group
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
@@ -169,6 +170,9 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
             pass
 
         group = self.group_infos.get_group_info(group_name)
+        if self.group_type_combobox.currentIndex() == 4:
+            group = Group(self.file_combobox.currentText())
+
         self.table_widget.setup_table(group)
         if self.file_combobox.count():
             self.table_widget.load_csv_file(self.get_csv_path(), self.group_type_combobox.currentIndex() == 4)
