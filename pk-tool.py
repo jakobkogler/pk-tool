@@ -82,6 +82,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
                 self.table_widget.group_infos.groups[group.name] = group
             self.group_type_combobox.setCurrentIndex(4)
             self.group_type_combobox.setDisabled(True)
+            self.action_new.setDisabled(True)
             self.populate_files()
 
     def read_repo(self):
