@@ -16,6 +16,7 @@ Es wird also geraten, dass man Python und PyQt installiert (siehe Voraussetzunge
 Ansonsten:
 
 Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.4/pk-tool.exe)
+
 Kompilierte Version für Linux (kompiliert unter Manjaro 15.12) [pk-tool](https://github.com/jakobkogler/pk-tool/releases/download/0.4/pk-tool)
 
 ## Voraussetzungen ##
