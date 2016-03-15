@@ -1,1 +1,1 @@
-sudo pyinstaller --noconfirm --clean --onefile --windowed pk-tool.py
+pyinstaller --noconfirm --clean --onefile --windowed pk-tool.py
