@@ -181,6 +181,8 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.setup_table(group)
         if self.file_combobox.count():
             self.table_widget.load_csv_file(self.get_csv_path(), self.group_type_combobox.currentIndex() == 4)
+        else:
+            self.table_widget.clear()
 
     def get_email(self):
         """
