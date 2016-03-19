@@ -11,6 +11,7 @@ from src.git_interactions import GitInteractions
 from dialog.gitdialog import GitDialog
 from dialog.load_test_dialog import LoadTestDialog
 from src.group import Group
+from dialog.create_csv import CreateCSVDialog
 
 
 class PkToolMainWindow(QMainWindow, Ui_MainWindow):
@@ -201,26 +202,16 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         """
         Generate a new csv-file for this group.
         """
-        path_suggestion = '/Anwesenheiten/Uebungen/' + self.group_combobox.currentText() + '_ue' + \
-                          str(len(self.file_combobox) + 1) + '.csv'
+        create_csv_dialog = CreateCSVDialog(self.settings, self.group_combobox.currentText())
+        create_csv_dialog.exec_()
 
-        directory = self.settings.repo_path
-        path = QFileDialog.getSaveFileName(self, 'Neue CSV-Datei', directory + path_suggestion, '*.csv')[0]
-        if not path:
-            return
-
-        if not path.endswith('.csv'):
-            path += '.csv'
-
-        with io.open(path, 'w', encoding='utf-8', newline='') as f:
-            f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
-
-        self.populate_files()
-        index = self.file_combobox.count() - 1
-        for i in range(self.file_combobox.count()):
-            if path.endswith(self.file_combobox.itemText(i)):
-                index = i
-        self.file_combobox.setCurrentIndex(index)
+        if create_csv_dialog.selected_file:
+            self.populate_files()
+            index = self.file_combobox.count() - 1
+            for i in range(self.file_combobox.count()):
+                if create_csv_dialog.selected_file == self.file_combobox.itemText(i):
+                    index = i
+            self.file_combobox.setCurrentIndex(index)
 
     def populate_files(self):
         """

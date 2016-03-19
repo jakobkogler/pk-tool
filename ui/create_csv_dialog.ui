@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CreateCSVDialog</class>
+ <widget class="QDialog" name="CreateCSVDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>593</width>
+    <height>111</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Erzeuge ein neues CSV-Datei für eine Übung</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Für welche Übung möchten Sie eine CSV-Datei erzeugen?</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="file_combobox"/>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QPushButton" name="create_button">
+     <property name="text">
+      <string>Erzeuge CSV-Datei</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
