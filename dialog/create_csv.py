@@ -1,20 +1,15 @@
 import os
 import io
 from PyQt5.QtWidgets import QDialog
-from PyQt5 import QtCore
 from ui.create_csv_dialog import Ui_CreateCSVDialog
 from src.settings import Settings
 
 
 class CreateCSVDialog(QDialog, Ui_CreateCSVDialog):
-    """
-    Dialog for creating new csv files for lessons
-    """
+    """Dialog for creating new csv files for lessons."""
 
     def __init__(self, settings: Settings, group_name: str):
-        """
-        Initialize everything.
-        """
+        """Initialize everything."""
         QDialog.__init__(self)
         self.setupUi(self)
 
@@ -42,8 +37,8 @@ class CreateCSVDialog(QDialog, Ui_CreateCSVDialog):
                                                             self.file_combobox.currentText(), self.group_name)
 
         if not os.path.exists(path):
-            with io.open(path, 'w', encoding='utf-8', newline='') as f:
-                f.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
+            with io.open(path, 'w', encoding='utf-8', newline='') as file:
+                file.write('MatrNr;Gruppe;Kontrolle;Kommentar\n')
 
         self.selected_file = self.file_combobox.currentText()
         self.close()

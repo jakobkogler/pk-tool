@@ -1,8 +1,7 @@
-import io
 import os
 import sys
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QInputDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QInputDialog, QMessageBox
 from ui.mainwindow import Ui_MainWindow
 from src.group_infos import GroupInfos
 from src.settings import Settings
