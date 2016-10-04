@@ -21,11 +21,9 @@ Kompilierte Version für Linux (kompiliert unter Manjaro 15.12) [pk-tool](https:
 
 ## Voraussetzungen ##
 
-* Python 3.5.1
-* PyQt 5.5.1
-* GitPython, falls man Git-Interaktionen wünscht (`pip install gitpython`)
-
-Höchstwahrscheinlich funktionieren auch ältere Versionen von Python (wie 3.4) und PyQt (wie 5.2). Habe es aber nur mit meinen obigen aktuellen Versionen getestet.  
+* Python 3.5
+* PyQt 5 (`pip install PyQt5`)
+* GitPython für experimentellen Git-Modus (`pip install gitpython`)
 
 ## Benutzung ##
 
