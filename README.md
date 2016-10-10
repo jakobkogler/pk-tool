@@ -8,26 +8,22 @@ Eine kleine Gui, die PK-Tutoren während der Übungen unterstützen soll. Sie di
 
 ## Download
 
-Achtung: Bei diesen vorkompilierten Versionen funktionieren möglicherweise nicht alle Funktionen. 
-Die Git-Interaktionen funktionieren mit meinem Windows nicht (eventuell aber nur bei mir). 
-Und außerdem ist das Design des Programmes mit den vorkompilierten Versionen relativ hässlich.
+Es wird also geraten, das Repo zu klonen (`git clone https://github.com/jakobkogler/pk-tool.git`) und alle folgenden Voraussetzungen zu installieren. 
 
-Es wird also geraten, dass man Python und PyQt installiert (siehe Voraussetzungen) und das Programm damit ausführt. 
-Ansonsten:
+* Python 3.5
+* PyQt 5 (`python3 -m pip install PyQt5`)
+* GitPython für experimentellen Git-Modus (`python3 -m pip install gitpython`)
+
+Andernfalls kann man auch eine vorkompilierte Version downloaden. Bei diesen vorkompilierten Program funktionieren aber möglicherweise nicht alle Funktionen. Die Git-Interaktionen funktionieren mit meinem Windows nicht (eventuell aber nur bei mir). 
+Und außerdem ist das Design des Programmes mit den vorkompilierten Versionen relativ hässlich.
 
 Kompilierte Version für Windows 10: [pk-tool.exe](https://github.com/jakobkogler/pk-tool/releases/download/0.4/pk-tool.exe)
 
 Kompilierte Version für Linux (kompiliert unter Manjaro 15.12) [pk-tool](https://github.com/jakobkogler/pk-tool/releases/download/0.4/pk-tool)
 
-## Voraussetzungen ##
-
-* Python 3.5
-* PyQt 5 (`pip install PyQt5`)
-* GitPython für experimentellen Git-Modus (`pip install gitpython`)
-
 ## Benutzung ##
 
-Das Programm startet man mit `python3 pk-tool.py`. 
+Das Programm startet man mit `python3 pk-tool.py` oder per Doppelklick, falls eine vorkomplierte Version verwendet wird. 
 Nach dem ersten Start des Programmes muss man ein paar Einstellungen vornehmen.
 Den Einstellungs-Dialog findet man unter `Datei - Einstellungen`. 
 Dort muss man den Pfad zum PK-Repository angeben, und kann außerdem seinen Usernamen festlegen, um eine bessere Übersicht über seine Gruppen zu bekommen. 
